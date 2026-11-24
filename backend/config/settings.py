@@ -187,16 +187,13 @@ LOGIN_REDIRECT_URL = "/"
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
-EMAIL_HOST = os.environ.get(
-    "EMAIL_HOST",
-    "smtp.gmail.com"
-)
+EMAIL_HOST = "smtp.gmail.com"
 
-EMAIL_PORT = int(
-    os.environ.get("EMAIL_PORT", "587")
-)
+EMAIL_PORT = 465
 
-EMAIL_USE_TLS = True
+EMAIL_USE_TLS = False
+
+EMAIL_USE_SSL = True
 
 EMAIL_HOST_USER = os.environ.get(
     "FOODKART_EMAIL",
@@ -220,6 +217,9 @@ OTP_EXPIRY_SECONDS = 300
 OTP_RESEND_WAIT_SECONDS = 15
 
 OTP_MAX_ATTEMPTS = 5
+
+
+# ================= LOGGING =================
 
 LOGGING = {
     "version": 1,
