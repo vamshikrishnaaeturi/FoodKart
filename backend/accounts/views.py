@@ -1,9 +1,9 @@
-
 import logging
 import json
 import secrets
 import hashlib
 import re
+import resend
 
 from datetime import timedelta
 from decimal import Decimal, InvalidOperation
@@ -22,7 +22,6 @@ from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.core.files.storage import default_storage
-from django.core.mail import send_mail
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 from django.db import transaction
@@ -82,23 +81,41 @@ def send_email_otp(email, purpose, pending_data=None):
 
     try:
 
-        send_mail(
-            "FoodKart Email Verification OTP",
-            (
+        # Set Resend API key
+        resend.api_key = settings.RESEND_API_KEY
+
+        # Send OTP through Resend API
+        resend.Emails.send({
+            "from": settings.DEFAULT_FROM_EMAIL,
+            "to": [email],
+            "subject": "FoodKart Email Verification OTP",
+            "html": f"""
+                <div style="font-family: Arial, sans-serif;">
+                    <h2>FoodKart Email Verification</h2>
+
+                    <p>Your FoodKart verification OTP is:</p>
+
+                    <h1 style="letter-spacing: 5px;">
+                        {otp}
+                    </h1>
+
+                    <p>This OTP is valid for 5 minutes.</p>
+
+                    <p>Do not share this OTP with anyone.</p>
+                </div>
+            """,
+            "text": (
                 f"Your FoodKart OTP is {otp}.\n\n"
                 "This OTP is valid for 5 minutes.\n"
                 "Do not share it with anyone."
-            ),
-            settings.DEFAULT_FROM_EMAIL,
-            [email],
-            fail_silently=False
-        )
+            )
+        })
 
         return True, "OTP sent successfully."
 
     except Exception:
 
-        logger.exception("OTP email sending failed.")
+        logger.exception("Resend OTP email sending failed.")
 
         otp_record.delete()
 

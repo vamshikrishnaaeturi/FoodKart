@@ -1,4 +1,3 @@
-
 import os
 from pathlib import Path
 import dj_database_url
@@ -185,27 +184,9 @@ LOGIN_REDIRECT_URL = "/"
 
 # ================= EMAIL CONFIGURATION =================
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
 
-EMAIL_HOST = "smtp.gmail.com"
-
-EMAIL_PORT = 465
-
-EMAIL_USE_TLS = False
-
-EMAIL_USE_SSL = True
-
-EMAIL_HOST_USER = os.environ.get(
-    "FOODKART_EMAIL",
-    ""
-)
-
-EMAIL_HOST_PASSWORD = os.environ.get(
-    "FOODKART_EMAIL_PASSWORD",
-    ""
-)
-
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = "onboarding@resend.dev"
 
 
 # ================= OTP CONFIGURATION =================
