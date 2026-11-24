@@ -1,0 +1,954 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodKart - Sign In / Sign Up</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #f3590c;
+            --primary-light: #ff742e;
+            --dark: #252535;
+            --muted: #777985;
+            --bg-base: #fffaf6;
+            --card-bg: #ffffff;
+            --card-border: #f0e6df;
+            --input-bg: #fffaf7;
+            --input-border: #e6dcd5;
+            --tab-bg: #f5eee9;
+        }
+
+        body.dark-mode {
+            --dark: #f5f7fa;
+            --muted: #9aa3b2;
+            --bg-base: #14171e;
+            --card-bg: #1e222b;
+            --card-border: #2e3340;
+            --input-bg: #252a35;
+            --input-border: #343a49;
+            --tab-bg: #161922;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-base);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+            position: relative;
+            overflow-x: hidden;
+            transition: background 0.35s ease, color 0.35s ease;
+        }
+
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(85px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body::before {
+            width: 380px;
+            height: 380px;
+            background: rgba(243, 89, 12, 0.2);
+            top: -80px;
+            left: -60px;
+        }
+
+        body::after {
+            width: 340px;
+            height: 340px;
+            background: rgba(255, 165, 52, 0.18);
+            bottom: -80px;
+            right: -60px;
+        }
+
+        body.dark-mode::before {
+            background: rgba(243, 89, 12, 0.14);
+        }
+
+        body.dark-mode::after {
+            background: rgba(255, 116, 46, 0.1);
+        }
+
+        .auth-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 440px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: max-width 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .auth-wrapper.wide-signup {
+            max-width: 540px;
+        }
+
+        .top-bar {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            padding: 0 4px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--dark);
+            text-decoration: none;
+            letter-spacing: -0.6px;
+        }
+
+        .logo span {
+            color: var(--primary);
+        }
+
+        .back-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 50px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            transition: all 0.25s ease;
+        }
+
+        .back-home:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 14px rgba(243, 89, 12, 0.2);
+        }
+
+        .auth-box {
+            width: 100%;
+            background: var(--card-bg);
+            padding: 34px 32px;
+            border-radius: 26px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 22px 55px rgba(30, 22, 15, 0.08);
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        body.dark-mode .auth-box {
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+        }
+
+        .auth-tabs {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: var(--tab-bg);
+            padding: 5px;
+            border-radius: 50px;
+            margin-bottom: 26px;
+            border: 1px solid var(--card-border);
+            overflow: hidden;
+        }
+
+        .auth-tabs::before {
+            content: "";
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: calc(50% - 5px);
+            height: calc(100% - 10px);
+            border-radius: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            box-shadow: 0 4px 15px rgba(243, 89, 12, 0.38);
+            transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+            z-index: 0;
+        }
+
+        .auth-tabs.signup-active::before {
+            transform: translateX(100%);
+        }
+
+        .auth-tabs button {
+            position: relative;
+            z-index: 1;
+            padding: 11px;
+            border: none;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 750;
+            color: var(--muted);
+            background: transparent;
+            cursor: pointer;
+            transition: color 0.5s ease;
+        }
+
+        .auth-tabs button.active {
+            color: #ffffff;
+        }
+
+        .auth-box form:not([hidden]) {
+            animation: slowFormReveal 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes slowFormReveal {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-box h2 {
+            color: var(--dark);
+            font-size: 25px;
+            font-weight: 850;
+            letter-spacing: -0.4px;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            font-size: 13.5px;
+            color: var(--muted);
+            margin-bottom: 22px;
+            line-height: 1.5;
+        }
+
+        .signup-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0 14px;
+        }
+
+        .form-field {
+            min-width: 0;
+        }
+
+        .auth-box label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: var(--muted);
+            margin-bottom: 7px;
+        }
+
+        .auth-box input {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1.5px solid var(--input-border);
+            border-radius: 13px;
+            background: var(--input-bg);
+            color: var(--dark);
+            outline: none;
+            margin-bottom: 16px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+        }
+
+        .auth-box input::placeholder {
+            color: #a6abb7;
+        }
+
+        body.dark-mode .auth-box input::placeholder {
+            color: #636b7b;
+        }
+
+        .auth-box input:focus {
+            background: var(--card-bg);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(243, 89, 12, 0.16);
+        }
+
+        body.dark-mode .auth-box input:-webkit-autofill,
+        body.dark-mode .auth-box input:-webkit-autofill:hover,
+        body.dark-mode .auth-box input:-webkit-autofill:focus,
+        body.dark-mode .auth-box input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 1000px #252a35 inset !important;
+            -webkit-text-fill-color: #f5f7fa !important;
+            caret-color: #f5f7fa;
+            border-color: #343a49 !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        body.dark-mode .auth-box input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 1000px #1e222b inset, 0 0 0 4px rgba(243, 89, 12, 0.16) !important;
+            border-color: var(--primary) !important;
+        }
+
+        .forgot-row {
+            text-align: right;
+            margin-top: -8px;
+            margin-bottom: 18px;
+        }
+
+        .forgot-row a {
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .forgot-row a:hover {
+            text-decoration: underline;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: #ffffff;
+            border: none;
+            border-radius: 13px;
+            padding: 14.5px;
+            font-weight: 750;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 4px;
+            box-shadow: 0 6px 20px rgba(243, 89, 12, 0.38);
+            transition: transform 0.25s ease, box-shadow 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 26px rgba(243, 89, 12, 0.58);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .resend-otp-btn {
+            width: 100%;
+            padding: 13px;
+            margin-top: 12px;
+            background: transparent;
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
+            border-radius: 13px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .resend-otp-btn:hover:not(:disabled) {
+            background: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 4px 16px rgba(243, 89, 12, 0.35);
+        }
+
+        .resend-otp-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .switch-text {
+            text-align: center;
+            color: var(--muted);
+            font-size: 13.5px;
+            margin-top: 20px;
+        }
+
+        .switch-text a {
+            color: var(--primary);
+            font-weight: 750;
+            text-decoration: none;
+        }
+
+        .switch-text a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #dc2626;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            padding: 12px 14px;
+            border-radius: 11px;
+            margin-bottom: 18px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        body.dark-mode .error-message {
+            background: rgba(220, 38, 38, 0.15);
+            border-color: rgba(220, 38, 38, 0.35);
+            color: #fca5a5;
+        }
+
+        .success-message {
+            color: #15803d;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            padding: 12px 14px;
+            border-radius: 11px;
+            margin-bottom: 18px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        body.dark-mode .success-message {
+            background: rgba(21, 128, 61, 0.16);
+            border-color: rgba(34, 197, 94, 0.35);
+            color: #86efac;
+        }
+
+        .otp-info {
+            background: rgba(243, 89, 12, 0.08);
+            border: 1px solid rgba(243, 89, 12, 0.25);
+            padding: 13px 14px;
+            border-radius: 12px;
+            margin-bottom: 18px;
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        body.dark-mode .otp-info {
+            background: rgba(243, 89, 12, 0.14);
+            border-color: rgba(243, 89, 12, 0.35);
+        }
+
+        .otp-info strong {
+            color: var(--dark);
+        }
+
+        .bottom-tagline {
+            margin-top: 18px;
+            font-size: 12.5px;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        @media (max-width: 520px) {
+            .signup-grid {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .auth-box {
+                padding: 26px 20px;
+                border-radius: 20px;
+            }
+
+            .logo {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<script>
+    (function () {
+        if (localStorage.getItem("foodkart_theme") === "dark") {
+            document.body.classList.add("dark-mode");
+        }
+    })();
+</script>
+
+<div class="auth-wrapper" id="authWrapper">
+
+    <div class="top-bar">
+        <a href="{% url 'home' %}" class="logo">
+            Food<span>Kart.</span>
+        </a>
+
+        <a href="{% url 'home' %}" class="back-home">
+            ← Home
+        </a>
+    </div>
+
+    <div class="auth-box">
+
+        <!-- SIGN IN / SIGN UP TABS -->
+        <div class="auth-tabs" id="authTabs">
+            <button type="button" id="signinTab">Sign In</button>
+            <button type="button" id="signupTab">Sign Up</button>
+        </div>
+
+        <!-- DJANGO MESSAGES -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="{% if message.tags == 'error' %}error-message{% else %}success-message{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- SIGN IN -->
+        <form id="signinForm" method="POST" action="{% url 'login' %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.GET.next|default:'' }}">
+            <input type="hidden" name="action" value="signin">
+
+            <h2>Welcome Back!</h2>
+            <p class="subtitle">Sign in to order your favourite meals.</p>
+
+            <label for="signinEmail">Email Address</label>
+            <input type="email" id="signinEmail" name="email"
+                   placeholder="Enter your email" required>
+
+            <label for="signinPassword">Password</label>
+            <input type="password" id="signinPassword" name="password"
+                   placeholder="Enter your password" required>
+
+            <div class="forgot-row">
+                <a href="#" id="forgotPasswordLink">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="submit-btn">Sign In</button>
+
+            <p class="switch-text">
+                Don't have an account?
+                <a href="#" id="showSignup">Sign Up</a>
+            </p>
+        </form>
+
+        <!-- FORGOT PASSWORD: EMAIL -->
+        <form id="forgotPasswordForm" method="POST"
+              action="{% url 'login' %}" hidden>
+            {% csrf_token %}
+            <input type="hidden" name="action" value="forgot_password">
+
+            <h2>Forgot Password?</h2>
+            <p class="subtitle">
+                Enter your registered email address to receive a reset OTP.
+            </p>
+
+            <label for="forgotEmail">Email Address</label>
+            <input type="email" id="forgotEmail" name="email"
+                   placeholder="Enter your registered email" required>
+
+            <button type="submit" class="submit-btn">Send Reset OTP</button>
+
+            <p class="switch-text">
+                Remember your password?
+                <a href="#" id="backToSignin">Back to Sign In</a>
+            </p>
+        </form>
+
+        <!-- FORGOT PASSWORD: VERIFY OTP -->
+        <form id="verifyResetForm" method="POST"
+              action="{% url 'login' %}" hidden>
+            {% csrf_token %}
+            <input type="hidden" name="action" value="verify_reset_otp">
+
+            <h2>Verify Reset OTP</h2>
+            <p class="subtitle">
+                Enter the 6-digit OTP sent to your registered email.
+            </p>
+
+            <div class="otp-info">
+                <strong>Password reset verification</strong><br>
+                Your OTP is valid for 5 minutes. Check your inbox or spam folder.
+            </div>
+
+            <label for="resetOtp">Reset OTP</label>
+            <input type="text" id="resetOtp" name="reset_otp"
+                   placeholder="Enter 6-digit OTP"
+                   inputmode="numeric" pattern="[0-9]{6}"
+                   minlength="6" maxlength="6"
+                   autocomplete="one-time-code" required>
+
+            <button type="submit" class="submit-btn">Verify OTP</button>
+
+            <p class="switch-text">
+                <a href="#" id="backToForgotEmail">Change email address</a>
+            </p>
+        </form>
+
+        <!-- FORGOT PASSWORD: NEW PASSWORD -->
+        <form id="resetPasswordForm" method="POST"
+              action="{% url 'login' %}" hidden>
+            {% csrf_token %}
+            <input type="hidden" name="action" value="reset_password">
+
+            <h2>Create New Password</h2>
+            <p class="subtitle">
+                Your OTP is verified. Enter your new password below.
+            </p>
+
+            <label for="newPassword">New Password</label>
+            <input type="password" id="newPassword" name="new_password"
+                   placeholder="Enter new password" required>
+
+            <label for="confirmPassword">Confirm New Password</label>
+            <input type="password" id="confirmPassword" name="confirm_password"
+                   placeholder="Confirm new password" required>
+
+            <button type="submit" class="submit-btn">Reset Password</button>
+        </form>
+
+        <!-- SIGN UP -->
+        <form id="signupForm" method="POST"
+              action="{% url 'login' %}" hidden>
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.GET.next|default:'' }}">
+            <input type="hidden" name="action" value="send_otp">
+
+            <h2>Create Account</h2>
+            <p class="subtitle">
+                Join FoodKart and get fresh food delivered fast.
+            </p>
+
+            <div class="signup-grid">
+
+                <div class="form-field">
+                    <label for="signupName">Full Name</label>
+                    <input type="text" id="signupName" name="name"
+                           placeholder="Full name" required>
+                </div>
+
+                <div class="form-field">
+                    <label for="signupPhone">Phone Number</label>
+                    <input type="tel" id="signupPhone" name="phone"
+                           placeholder="10-digit number"
+                           pattern="[6-9][0-9]{9}"
+                           maxlength="10" minlength="10" required>
+                </div>
+
+                <div class="form-field">
+                    <label for="signupEmail">Email Address</label>
+                    <input type="email" id="signupEmail" name="email"
+                           placeholder="Email address" required>
+                </div>
+
+                <div class="form-field">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" name="password"
+                           placeholder="Min 6 characters"
+                           minlength="6" required>
+                </div>
+
+            </div>
+
+            <button type="submit" class="submit-btn">Send Email OTP</button>
+
+            <p class="switch-text">
+                Already have an account?
+                <a href="#" id="showSignin">Sign In</a>
+            </p>
+        </form>
+
+        <!-- SIGNUP: VERIFY EMAIL OTP -->
+        <form id="verifyForm" method="POST"
+              action="{% url 'login' %}"
+              {% if not pending_signup %}hidden{% endif %}>
+
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.GET.next|default:'' }}">
+            <input type="hidden" name="action" value="verify_otp">
+
+            <h2>Verify Your Email</h2>
+            <p class="subtitle">
+                Verify your email address to create your FoodKart account.
+            </p>
+
+            <div class="otp-info">
+                <strong>Email verification</strong><br>
+                A 6-digit OTP has been sent to your registered email.
+                Your OTP is valid for 5 minutes.
+            </div>
+
+            <label for="email_otp">Email OTP</label>
+            <input type="text" id="email_otp" name="email_otp"
+                   placeholder="Enter 6-digit email OTP"
+                   inputmode="numeric" pattern="[0-9]{6}"
+                   minlength="6" maxlength="6"
+                   autocomplete="one-time-code" required>
+
+            <button type="submit" class="submit-btn">
+                Verify Email OTP &amp; Create Account
+            </button>
+
+            <button type="submit" form="resendForm"
+                    id="resendOtpBtn" class="resend-otp-btn" disabled>
+                Resend OTP in 15s
+            </button>
+
+            <p class="switch-text">
+                Wrong details?
+                <a href="{% url 'login' %}">Start Again</a>
+            </p>
+        </form>
+
+        <!-- RESEND SIGNUP OTP -->
+        <form id="resendForm" method="POST"
+              action="{% url 'login' %}" hidden>
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.GET.next|default:'' }}">
+            <input type="hidden" name="action" value="resend_otp">
+        </form>
+
+    </div>
+
+    <p class="bottom-tagline">
+        🍕 Delicious food delivered hot to your doorstep
+    </p>
+</div>
+
+<!-- PASSWORD RESET SESSION STATUS -->
+<div id="reset-status"
+     data-pending="{{ pending_password_reset|yesno:'true,false' }}"
+     data-verified="{{ pending_password_reset.verified|yesno:'true,false' }}"
+     hidden>
+</div>
+
+<script>
+    /* ================= THEME ================= */
+
+    function syncThemeFromHome() {
+        const isDark = localStorage.getItem("foodkart_theme") === "dark";
+        document.body.classList.toggle("dark-mode", isDark);
+    }
+
+    syncThemeFromHome();
+
+    window.addEventListener("storage", function (e) {
+        if (!e.key || e.key === "foodkart_theme") {
+            syncThemeFromHome();
+        }
+    });
+
+    window.addEventListener("pageshow", syncThemeFromHome);
+    window.addEventListener("focus", syncThemeFromHome);
+
+
+    /* ================= ELEMENTS ================= */
+
+    const authWrapper = document.getElementById("authWrapper");
+
+    const signinTab = document.getElementById("signinTab");
+    const signupTab = document.getElementById("signupTab");
+    const authTabs = document.getElementById("authTabs");
+
+    const signinForm = document.getElementById("signinForm");
+    const signupForm = document.getElementById("signupForm");
+    const verifyForm = document.getElementById("verifyForm");
+
+    const forgotPasswordForm = document.getElementById("forgotPasswordForm");
+    const verifyResetForm = document.getElementById("verifyResetForm");
+    const resetPasswordForm = document.getElementById("resetPasswordForm");
+
+    const resendOtpBtn = document.getElementById("resendOtpBtn");
+    const resetStatus = document.getElementById("reset-status");
+
+    const verificationPending = !verifyForm.hidden;
+
+
+    /* ================= FORM CONTROL ================= */
+
+    function hideAllForms() {
+        signinForm.hidden = true;
+        signupForm.hidden = true;
+        verifyForm.hidden = true;
+        forgotPasswordForm.hidden = true;
+        verifyResetForm.hidden = true;
+        resetPasswordForm.hidden = true;
+    }
+
+    function updateTabs(activeTab, expandCard = false) {
+        authTabs.hidden = false;
+
+        signinTab.classList.toggle("active", activeTab === "signin");
+        signupTab.classList.toggle("active", activeTab === "signup");
+
+        authTabs.classList.toggle("signup-active", activeTab === "signup");
+
+        authWrapper.classList.toggle("wide-signup", expandCard);
+    }
+
+
+    /* ================= SIGN IN ================= */
+
+    function showSignin() {
+        hideAllForms();
+
+        signinForm.hidden = false;
+
+        updateTabs("signin", false);
+    }
+
+
+    /* ================= SIGN UP ================= */
+
+    function showSignup() {
+        hideAllForms();
+
+        signupForm.hidden = false;
+
+        updateTabs("signup", true);
+    }
+
+
+    /* ================= VERIFY SIGNUP OTP ================= */
+
+    function showVerification() {
+        hideAllForms();
+
+        verifyForm.hidden = false;
+
+        updateTabs("signup", true);
+    }
+
+
+    /* ================= FORGOT PASSWORD ================= */
+
+    function showForgotPassword() {
+        hideAllForms();
+
+        forgotPasswordForm.hidden = false;
+
+        authTabs.hidden = true;
+        authWrapper.classList.remove("wide-signup");
+    }
+
+
+    /* ================= VERIFY RESET OTP ================= */
+
+    function showResetVerification() {
+        hideAllForms();
+
+        verifyResetForm.hidden = false;
+
+        authTabs.hidden = true;
+        authWrapper.classList.remove("wide-signup");
+    }
+
+
+    /* ================= NEW PASSWORD ================= */
+
+    function showNewPassword() {
+        hideAllForms();
+
+        resetPasswordForm.hidden = false;
+
+        authTabs.hidden = true;
+        authWrapper.classList.remove("wide-signup");
+    }
+
+
+    /* ================= TAB EVENTS ================= */
+
+    signinTab.addEventListener("click", showSignin);
+    signupTab.addEventListener("click", showSignup);
+
+    document.getElementById("showSignup").addEventListener("click", function(e) {
+        e.preventDefault();
+        showSignup();
+    });
+
+    document.getElementById("showSignin").addEventListener("click", function(e) {
+        e.preventDefault();
+        showSignin();
+    });
+
+    document.getElementById("forgotPasswordLink").addEventListener("click", function(e) {
+        e.preventDefault();
+        showForgotPassword();
+    });
+
+    document.getElementById("backToSignin").addEventListener("click", function(e) {
+        e.preventDefault();
+        showSignin();
+    });
+
+    document.getElementById("backToForgotEmail").addEventListener("click", function(e) {
+        e.preventDefault();
+        showForgotPassword();
+    });
+
+
+    /* ================= INITIAL PAGE DISPLAY ================= */
+
+    const resetOtpPending = resetStatus.dataset.pending === "true";
+    const resetOtpVerified = resetStatus.dataset.verified === "true";
+
+    if (verificationPending) {
+        showVerification();
+    } else if (resetOtpPending && resetOtpVerified) {
+        showNewPassword();
+    } else if (resetOtpPending) {
+        showResetVerification();
+    } else {
+        showSignin();
+    }
+
+
+    /* ================= RESEND OTP COUNTDOWN ================= */
+
+    let resendTimer;
+    let remainingSeconds = 15;
+
+    function startResendCountdown() {
+        clearInterval(resendTimer);
+
+        remainingSeconds = 15;
+
+        resendOtpBtn.disabled = true;
+        resendOtpBtn.textContent = `Resend OTP in ${remainingSeconds}s`;
+
+        resendTimer = setInterval(() => {
+            remainingSeconds--;
+
+            if (remainingSeconds > 0) {
+                resendOtpBtn.textContent = `Resend OTP in ${remainingSeconds}s`;
+            } else {
+                clearInterval(resendTimer);
+
+                resendOtpBtn.disabled = false;
+                resendOtpBtn.textContent = "Resend Email OTP";
+            }
+
+        }, 1000);
+    }
+
+    if (verificationPending) {
+        startResendCountdown();
+    }
+
+
+    /* ================= PASSWORD MATCH VALIDATION ================= */
+
+    resetPasswordForm.addEventListener("submit", function(e) {
+        const password = document.getElementById("newPassword").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+
+        if (password !== confirmPassword) {
+            e.preventDefault();
+            alert("Passwords do not match.");
+        }
+    });
+
+</script>
+
+</body>
+</html>
