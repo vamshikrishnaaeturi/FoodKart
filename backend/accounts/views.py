@@ -15,6 +15,20 @@ from django.conf import settings
 from django.shortcuts import redirect, render, get_object_or_404
 from django.http import JsonResponse
 from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required, require_POST
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.password_validation import validate_password
+from django.utils import timezone
+from django.db import transaction
+from django.core.files.storage import default_storage
+
+from .models import EmailOTP, Profile, SavedAddress
+
+logger = logging.getLogger(__name__)
 
 logger = logging.getLogger(__name__)
 
