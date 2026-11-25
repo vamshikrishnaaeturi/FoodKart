@@ -5,6 +5,7 @@ import hashlib
 import re
 import os
 import urllib.request
+import urllib.error
 
 from datetime import timedelta
 from decimal import Decimal, InvalidOperation
@@ -46,7 +47,7 @@ def hash_otp(otp):
 
 
 def send_email_otp(email, purpose, pending_data=None):
-    
+
     now = timezone.now()
 
     api_key = os.environ.get("BREVO_API_KEY", "")
@@ -154,11 +155,28 @@ def send_email_otp(email, purpose, pending_data=None):
 
     except Exception as error:
 
-        logger.exception("Brevo OTP email sending failed: %s", error)   
+        # Log the actual error returned by Brevo
+        if isinstance(error, urllib.error.HTTPError):
+
+            error_details = error.read().decode(
+                "utf-8",
+                errors="replace"
+            )
+
+            logger.error(
+                "Brevo API error details: %s",
+                error_details
+            )
+
+        logger.exception(
+            "Brevo OTP email sending failed: %s",
+            error
+        )
 
         otp_record.delete()
 
         return False, "Unable to send OTP. Please try again."
+
 
 # =====================================================
 # LOGIN, SIGNUP AND PASSWORD RESET
