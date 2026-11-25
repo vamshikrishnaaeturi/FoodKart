@@ -3,7 +3,7 @@ import json
 import secrets
 import hashlib
 import re
-import resend
+from django.core.mail import EmailMultiAlternatives
 
 from datetime import timedelta
 from decimal import Decimal, InvalidOperation
@@ -45,19 +45,12 @@ def hash_otp(otp):
 
 
 def send_email_otp(email, purpose, pending_data=None):
-
+    
     now = timezone.now()
 
-    # Validate Resend configuration before creating an OTP record.
-    api_key = settings.RESEND_API_KEY
-    sender_email = settings.DEFAULT_FROM_EMAIL
-
-    if not api_key:
-        logger.error("RESEND_API_KEY is missing from environment variables.")
-        return False, "Email service is not configured. Please try again later."
-
-    if not sender_email:
-        logger.error("DEFAULT_FROM_EMAIL is not configured.")
+    # Check Gmail configuration
+    if not settings.EMAIL_HOST_USER or not settings.EMAIL_HOST_PASSWORD:
+        logger.error("Gmail email configuration is missing.")
         return False, "Email service is not configured. Please try again later."
 
     existing_otp = EmailOTP.objects.filter(
@@ -93,43 +86,56 @@ def send_email_otp(email, purpose, pending_data=None):
 
     try:
 
-        # Configure Resend API.
-        resend.api_key = api_key
+        subject = "FoodKart Email Verification OTP"
 
-        # Send the OTP using Resend.
-        response = resend.Emails.send({
-            "from": sender_email,
-            "to": [email],
-            "subject": "FoodKart Email Verification OTP",
-            "html": f"""
-                <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto; padding: 24px;">
-                    <h2>FoodKart Email Verification</h2>
-                    <p>Your FoodKart verification OTP is:</p>
-                    <h1 style="letter-spacing: 5px; color: #ff6b2b;">{otp}</h1>
-                    <p>This OTP is valid for 5 minutes.</p>
-                    <p>Do not share this OTP with anyone.</p>
-                </div>
-            """,
-            "text": (
-                f"Your FoodKart OTP is {otp}.\n\n"
-                "This OTP is valid for 5 minutes.\n"
-                "Do not share it with anyone."
-            )
-        })
+        text_message = (
+            f"Your FoodKart OTP is {otp}.\n\n"
+            "This OTP is valid for 5 minutes.\n"
+            "Do not share it with anyone."
+        )
 
-        logger.info("Resend accepted OTP email request. Response: %s", response)
+        html_message = f"""
+        <div style="font-family: Arial, sans-serif;
+                    max-width: 500px;
+                    margin: auto;
+                    padding: 24px;">
+            <h2>FoodKart Email Verification</h2>
+            <p>Your FoodKart verification OTP is:</p>
+
+            <h1 style="letter-spacing: 5px; color: #ff6b2b;">
+                {otp}
+            </h1>
+
+            <p>This OTP is valid for 5 minutes.</p>
+            <p>Do not share this OTP with anyone.</p>
+        </div>
+        """
+
+        email_message = EmailMultiAlternatives(
+            subject=subject,
+            body=text_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[email]
+        )
+
+        email_message.attach_alternative(
+            html_message,
+            "text/html"
+        )
+
+        email_message.send(fail_silently=False)
+
+        logger.info("OTP email successfully sent to %s", email)
+
         return True, "OTP sent successfully."
 
     except Exception as error:
 
-        # Log the full provider exception in deployment logs for diagnosis.
-        logger.exception("Resend OTP email sending failed: %s", error)
+        logger.exception("Gmail OTP email sending failed: %s", error)
 
-        # Do not leave a verification record if the email could not be sent.
         otp_record.delete()
 
         return False, "Unable to send OTP. Please try again."
-
 
 def check_email_otp(email, purpose, entered_otp):
 

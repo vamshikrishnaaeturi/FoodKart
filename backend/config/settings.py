@@ -184,10 +184,16 @@ LOGIN_REDIRECT_URL = "/"
 
 # ================= EMAIL CONFIGURATION =================
 
-RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
-DEFAULT_FROM_EMAIL = "onboarding@resend.dev"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 
+EMAIL_HOST_USER = os.environ.get("FOODKART_EMAIL", "")
+EMAIL_HOST_PASSWORD = os.environ.get("FOODKART_EMAIL_PASSWORD", "")
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # ================= OTP CONFIGURATION =================
 
