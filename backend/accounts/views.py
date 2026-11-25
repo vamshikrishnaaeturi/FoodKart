@@ -17,7 +17,8 @@ from django.http import JsonResponse
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required, require_POST
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth.hashers import make_password
@@ -28,7 +29,6 @@ from django.core.files.storage import default_storage
 
 from .models import EmailOTP, Profile, SavedAddress
 
-logger = logging.getLogger(__name__)
 
 logger = logging.getLogger(__name__)
 
