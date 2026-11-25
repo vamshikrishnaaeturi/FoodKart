@@ -48,6 +48,18 @@ def send_email_otp(email, purpose, pending_data=None):
 
     now = timezone.now()
 
+    # Validate Resend configuration before creating an OTP record.
+    api_key = settings.RESEND_API_KEY
+    sender_email = settings.DEFAULT_FROM_EMAIL
+
+    if not api_key:
+        logger.error("RESEND_API_KEY is missing from environment variables.")
+        return False, "Email service is not configured. Please try again later."
+
+    if not sender_email:
+        logger.error("DEFAULT_FROM_EMAIL is not configured.")
+        return False, "Email service is not configured. Please try again later."
+
     existing_otp = EmailOTP.objects.filter(
         email=email,
         purpose=purpose
@@ -81,26 +93,20 @@ def send_email_otp(email, purpose, pending_data=None):
 
     try:
 
-        # Set Resend API key
-        resend.api_key = settings.RESEND_API_KEY
+        # Configure Resend API.
+        resend.api_key = api_key
 
-        # Send OTP through Resend API
-        resend.Emails.send({
-            "from": settings.DEFAULT_FROM_EMAIL,
+        # Send the OTP using Resend.
+        response = resend.Emails.send({
+            "from": sender_email,
             "to": [email],
             "subject": "FoodKart Email Verification OTP",
             "html": f"""
-                <div style="font-family: Arial, sans-serif;">
+                <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto; padding: 24px;">
                     <h2>FoodKart Email Verification</h2>
-
                     <p>Your FoodKart verification OTP is:</p>
-
-                    <h1 style="letter-spacing: 5px;">
-                        {otp}
-                    </h1>
-
+                    <h1 style="letter-spacing: 5px; color: #ff6b2b;">{otp}</h1>
                     <p>This OTP is valid for 5 minutes.</p>
-
                     <p>Do not share this OTP with anyone.</p>
                 </div>
             """,
@@ -111,12 +117,15 @@ def send_email_otp(email, purpose, pending_data=None):
             )
         })
 
+        logger.info("Resend accepted OTP email request. Response: %s", response)
         return True, "OTP sent successfully."
 
-    except Exception:
+    except Exception as error:
 
-        logger.exception("Resend OTP email sending failed.")
+        # Log the full provider exception in deployment logs for diagnosis.
+        logger.exception("Resend OTP email sending failed: %s", error)
 
+        # Do not leave a verification record if the email could not be sent.
         otp_record.delete()
 
         return False, "Unable to send OTP. Please try again."
