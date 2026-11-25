@@ -35,6 +35,18 @@ logger = logging.getLogger(__name__)
 
 
 # =====================================================
+# EMAIL OTP HELPERS
+# =====================================================
+
+def generate_otp():
+    return f"{secrets.randbelow(1000000):06d}"
+
+
+def hash_otp(otp):
+    return hashlib.sha256(otp.encode()).hexdigest()
+
+
+# =====================================================
 # VERIFY EMAIL OTP
 # =====================================================
 
@@ -50,16 +62,12 @@ def check_email_otp(email, purpose, entered_otp):
 
     # Check expiry
     if timezone.now() > otp_record.expires_at:
-
         otp_record.delete()
-
         return False, "OTP expired. Please request a new OTP.", None
 
     # Check maximum attempts
     if otp_record.attempts >= settings.OTP_MAX_ATTEMPTS:
-
         otp_record.delete()
-
         return False, "Maximum OTP attempts reached. Request a new OTP.", None
 
     # Verify OTP
@@ -76,9 +84,7 @@ def check_email_otp(email, purpose, entered_otp):
         )
 
         if remaining_attempts <= 0:
-
             otp_record.delete()
-
             return False, "Maximum OTP attempts reached. Request a new OTP.", None
 
         return (
@@ -89,6 +95,699 @@ def check_email_otp(email, purpose, entered_otp):
 
     # OTP verified successfully
     return True, "OTP verified successfully.", otp_record
+
+
+# =====================================================
+# SEND EMAIL OTP USING BREVO
+# =====================================================
+
+def send_email_otp(email, purpose, pending_data=None):
+
+    now = timezone.now()
+
+    api_key = os.environ.get("BREVO_API_KEY", "")
+
+    if not api_key:
+        logger.error("Brevo API key is missing.")
+        return False, "Email service is not configured. Please try again later."
+
+    existing_otp = EmailOTP.objects.filter(
+        email=email,
+        purpose=purpose
+    ).first()
+
+    if existing_otp:
+
+        elapsed = (
+            now - existing_otp.last_sent_at
+        ).total_seconds()
+
+        if elapsed < settings.OTP_RESEND_WAIT_SECONDS:
+            return False, "Please wait before requesting another OTP."
+
+        if pending_data is None:
+            pending_data = existing_otp.pending_data
+
+        existing_otp.delete()
+
+    otp = generate_otp()
+
+    otp_record = EmailOTP.objects.create(
+        email=email,
+        purpose=purpose,
+        otp_hash=hash_otp(otp),
+        pending_data=pending_data or {},
+        expires_at=now + timedelta(
+            seconds=settings.OTP_EXPIRY_SECONDS
+        )
+    )
+
+    try:
+
+        subject = "FoodKart Email Verification OTP"
+
+        text_message = (
+            f"Your FoodKart OTP is {otp}.\n\n"
+            "This OTP is valid for 5 minutes.\n"
+            "Do not share it with anyone."
+        )
+
+        html_message = f"""
+        <div style="font-family: Arial, sans-serif;
+                    max-width: 500px;
+                    margin: auto;
+                    padding: 24px;">
+            <h2>FoodKart Email Verification</h2>
+            <p>Your FoodKart verification OTP is:</p>
+
+            <h1 style="letter-spacing: 5px; color: #ff6b2b;">
+                {otp}
+            </h1>
+
+            <p>This OTP is valid for 5 minutes.</p>
+            <p>Do not share this OTP with anyone.</p>
+        </div>
+        """
+
+        payload = {
+            "sender": {
+                "email": settings.EMAIL_HOST_USER,
+                "name": "FoodKart"
+            },
+            "to": [
+                {
+                    "email": email
+                }
+            ],
+            "subject": subject,
+            "textContent": text_message,
+            "htmlContent": html_message
+        }
+
+        request_data = json.dumps(payload).encode("utf-8")
+
+        req = urllib.request.Request(
+            "https://api.brevo.com/v3/smtp/email",
+            data=request_data,
+            headers={
+                "api-key": api_key,
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            method="POST"
+        )
+
+        with urllib.request.urlopen(req, timeout=20) as response:
+
+            if response.status not in (200, 201, 202):
+                raise Exception(
+                    f"Brevo returned status {response.status}"
+                )
+
+        logger.info("OTP email successfully sent to %s", email)
+
+        return True, "OTP sent successfully."
+
+    except Exception as error:
+
+        # Log the actual error returned by Brevo
+        if isinstance(error, urllib.error.HTTPError):
+
+            error_details = error.read().decode(
+                "utf-8",
+                errors="replace"
+            )
+
+            logger.error(
+                "Brevo API error details: %s",
+                error_details
+            )
+
+        logger.exception(
+            "Brevo OTP email sending failed: %s",
+            error
+        )
+
+        otp_record.delete()
+
+        return False, "Unable to send OTP. Please try again."
+
+
+# =====================================================
+# LOGIN, SIGNUP AND PASSWORD RESET
+# =====================================================
+
+def login_view(request):
+
+    if request.user.is_authenticated:
+        return redirect("home")
+
+    if request.method == "POST":
+
+        action = request.POST.get("action", "")
+
+        # SIGN IN
+        if action == "signin":
+
+            email = request.POST.get(
+                "email", ""
+            ).strip().lower()
+
+            password = request.POST.get(
+                "password", ""
+            )
+
+            user = User.objects.filter(
+                email__iexact=email
+            ).first()
+
+            authenticated_user = None
+
+            if user:
+
+                authenticated_user = authenticate(
+                    request,
+                    username=user.username,
+                    password=password
+                )
+
+            if authenticated_user:
+
+                login(request, authenticated_user)
+
+                messages.success(
+                    request,
+                    "Login successful!"
+                )
+
+                return redirect("home")
+
+            messages.error(
+                request,
+                "Invalid email or password."
+            )
+
+        # SEND SIGNUP OTP
+        elif action == "send_otp":
+
+            name = request.POST.get("name", "").strip()
+            email = request.POST.get("email", "").strip().lower()
+            phone = request.POST.get("phone", "").strip()
+            password = request.POST.get("password", "")
+
+            if not all([name, email, phone, password]):
+
+                messages.error(
+                    request,
+                    "Please fill all required fields."
+                )
+
+            elif not re.fullmatch(r"[6-9][0-9]{9}", phone):
+
+                messages.error(
+                    request,
+                    "Please enter a valid 10-digit phone number."
+                )
+
+            elif User.objects.filter(email__iexact=email).exists():
+
+                messages.error(
+                    request,
+                    "Email already registered. Please sign in."
+                )
+
+            else:
+
+                try:
+
+                    validate_email(email)
+
+                    temporary_user = User(
+                        username=email,
+                        email=email,
+                        first_name=name
+                    )
+
+                    password_hash = make_password(password)
+
+                    validate_password(
+                        password,
+                        temporary_user
+                    )
+
+                    pending_data = {
+                        "name": name,
+                        "email": email,
+                        "phone": phone,
+                        "password_hash": password_hash
+                    }
+
+                    success, message = send_email_otp(
+                        email,
+                        "signup",
+                        pending_data
+                    )
+
+                    if success:
+
+                        request.session["pending_signup"] = {
+                            "email": email
+                        }
+
+                        messages.success(
+                            request,
+                            "OTP sent to your email. Please verify it."
+                        )
+
+                    else:
+
+                        existing_otp = EmailOTP.objects.filter(
+                            email=email,
+                            purpose="signup"
+                        ).first()
+
+                        if existing_otp:
+
+                            request.session["pending_signup"] = {
+                                "email": email
+                            }
+
+                            messages.error(request, message)
+
+                        else:
+
+                            request.session.pop(
+                                "pending_signup",
+                                None
+                            )
+
+                            messages.error(request, message)
+
+                except ValidationError as error:
+
+                    for error_message in error.messages:
+                        messages.error(request, error_message)
+
+                except Exception:
+
+                    logger.exception("Signup OTP request failed.")
+
+                    messages.error(
+                        request,
+                        "Unable to start signup. Please try again."
+                    )
+
+        # VERIFY SIGNUP OTP
+        elif action == "verify_otp":
+
+            pending_signup = request.session.get(
+                "pending_signup"
+            )
+
+            if not pending_signup:
+
+                messages.error(
+                    request,
+                    "Signup session expired. Please start again."
+                )
+
+            else:
+
+                email = pending_signup.get("email", "").lower()
+
+                entered_otp = request.POST.get(
+                    "email_otp", ""
+                ).strip()
+
+                if not re.fullmatch(r"[0-9]{6}", entered_otp):
+
+                    messages.error(
+                        request,
+                        "Please enter a valid 6-digit OTP."
+                    )
+
+                else:
+
+                    success, message, otp_record = check_email_otp(
+                        email,
+                        "signup",
+                        entered_otp
+                    )
+
+                    if not success:
+
+                        messages.error(request, message)
+
+                    else:
+
+                        pending_data = otp_record.pending_data
+
+                        try:
+
+                            with transaction.atomic():
+
+                                if User.objects.filter(
+                                    email__iexact=email
+                                ).exists():
+
+                                    otp_record.delete()
+
+                                    request.session.pop(
+                                        "pending_signup",
+                                        None
+                                    )
+
+                                    messages.error(
+                                        request,
+                                        "This email is already registered."
+                                    )
+
+                                else:
+
+                                    new_user = User(
+                                        username=email,
+                                        email=email,
+                                        first_name=pending_data["name"]
+                                    )
+
+                                    new_user.password = pending_data["password_hash"]
+                                    new_user.save()
+
+                                    profile, created = Profile.objects.get_or_create(
+                                        user=new_user,
+                                        defaults={
+                                            "name": pending_data["name"],
+                                            "email": email,
+                                            "phone": pending_data["phone"]
+                                        }
+                                    )
+
+                                    if not created:
+
+                                        profile.name = pending_data["name"]
+                                        profile.email = email
+                                        profile.phone = pending_data["phone"]
+
+                                        profile.save()
+
+                                    otp_record.delete()
+
+                                    request.session.pop(
+                                        "pending_signup",
+                                        None
+                                    )
+
+                                    login(
+                                        request,
+                                        new_user,
+                                        backend="django.contrib.auth.backends.ModelBackend"
+                                    )
+
+                                    messages.success(
+                                        request,
+                                        "Email verified! Your FoodKart account has been created."
+                                    )
+
+                                    return redirect("home")
+
+                        except Exception:
+
+                            logger.exception(
+                                "Account creation after OTP verification failed."
+                            )
+
+                            messages.error(
+                                request,
+                                "Unable to create your account. Please try again."
+                            )
+
+        # RESEND SIGNUP OTP
+        elif action == "resend_otp":
+
+            pending_signup = request.session.get(
+                "pending_signup"
+            )
+
+            if not pending_signup:
+
+                messages.error(
+                    request,
+                    "Signup session expired. Please start again."
+                )
+
+            else:
+
+                email = pending_signup.get("email", "").lower()
+
+                existing_otp = EmailOTP.objects.filter(
+                    email=email,
+                    purpose="signup"
+                ).first()
+
+                if not existing_otp:
+
+                    messages.error(
+                        request,
+                        "Signup OTP expired. Please start signup again."
+                    )
+
+                    request.session.pop(
+                        "pending_signup",
+                        None
+                    )
+
+                else:
+
+                    success, message = send_email_otp(
+                        email,
+                        "signup",
+                        existing_otp.pending_data
+                    )
+
+                    if success:
+
+                        messages.success(
+                            request,
+                            "A new signup OTP has been sent to your email."
+                        )
+
+                    else:
+
+                        messages.error(request, message)
+
+        # FORGOT PASSWORD
+        elif action == "forgot_password":
+
+            email = request.POST.get(
+                "email", ""
+            ).strip().lower()
+
+            try:
+
+                validate_email(email)
+
+                user = User.objects.filter(
+                    email__iexact=email
+                ).first()
+
+                if not user:
+
+                    messages.error(
+                        request,
+                        "No account found with that email address."
+                    )
+
+                else:
+
+                    success, message = send_email_otp(
+                        email,
+                        "password_reset",
+                        {}
+                    )
+
+                    if success:
+
+                        request.session["pending_password_reset"] = {
+                            "email": email,
+                            "verified": False
+                        }
+
+                        messages.success(
+                            request,
+                            "Password reset OTP sent. Check your email."
+                        )
+
+                    else:
+
+                        messages.error(request, message)
+
+            except ValidationError:
+
+                messages.error(
+                    request,
+                    "Please enter a valid email address."
+                )
+
+        # VERIFY PASSWORD RESET OTP
+        elif action == "verify_reset_otp":
+
+            pending_reset = request.session.get(
+                "pending_password_reset"
+            )
+
+            if not pending_reset:
+
+                messages.error(
+                    request,
+                    "Password reset session expired. Please try again."
+                )
+
+            else:
+
+                email = pending_reset.get("email", "").lower()
+
+                entered_otp = request.POST.get(
+                    "reset_otp", ""
+                ).strip()
+
+                if not re.fullmatch(r"[0-9]{6}", entered_otp):
+
+                    messages.error(
+                        request,
+                        "Please enter a valid 6-digit OTP."
+                    )
+
+                else:
+
+                    success, message, otp_record = check_email_otp(
+                        email,
+                        "password_reset",
+                        entered_otp
+                    )
+
+                    if success:
+
+                        otp_record.delete()
+
+                        request.session["pending_password_reset"] = {
+                            "email": email,
+                            "verified": True
+                        }
+
+                        messages.success(
+                            request,
+                            "OTP verified. You can now create a new password."
+                        )
+
+                    else:
+
+                        messages.error(request, message)
+
+        # RESET PASSWORD
+        elif action == "reset_password":
+
+            pending_reset = request.session.get(
+                "pending_password_reset"
+            )
+
+            if not pending_reset or not pending_reset.get("verified"):
+
+                messages.error(
+                    request,
+                    "Please verify your reset OTP first."
+                )
+
+            else:
+
+                email = pending_reset.get("email", "").lower()
+
+                new_password = request.POST.get(
+                    "new_password", ""
+                )
+
+                confirm_password = request.POST.get(
+                    "confirm_password", ""
+                )
+
+                if not new_password or not confirm_password:
+
+                    messages.error(
+                        request,
+                        "Please enter both password fields."
+                    )
+
+                elif new_password != confirm_password:
+
+                    messages.error(
+                        request,
+                        "Passwords do not match."
+                    )
+
+                else:
+
+                    user = User.objects.filter(
+                        email__iexact=email
+                    ).first()
+
+                    if not user:
+
+                        messages.error(
+                            request,
+                            "Account not found."
+                        )
+
+                        request.session.pop(
+                            "pending_password_reset",
+                            None
+                        )
+
+                    else:
+
+                        try:
+
+                            validate_password(
+                                new_password,
+                                user
+                            )
+
+                            user.set_password(new_password)
+
+                            user.save(
+                                update_fields=["password"]
+                            )
+
+                            request.session.pop(
+                                "pending_password_reset",
+                                None
+                            )
+
+                            messages.success(
+                                request,
+                                "Password reset successful. Please sign in."
+                            )
+
+                        except ValidationError as error:
+
+                            for error_message in error.messages:
+                                messages.error(request, error_message)
+
+        else:
+
+            messages.error(
+                request,
+                "Invalid request."
+            )
+
+    return render(
+        request,
+        "login.html",
+        {
+            "pending_signup": request.session.get("pending_signup"),
+            "pending_password_reset": request.session.get(
+                "pending_password_reset"
+            ),
+        }
+    )
 
 
 # =====================================================
