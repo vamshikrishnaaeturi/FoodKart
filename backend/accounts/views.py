@@ -3,7 +3,8 @@ import json
 import secrets
 import hashlib
 import re
-from django.core.mail import EmailMultiAlternatives
+import os
+import urllib.request
 
 from datetime import timedelta
 from decimal import Decimal, InvalidOperation
@@ -14,20 +15,6 @@ from django.conf import settings
 from django.shortcuts import redirect, render, get_object_or_404
 from django.http import JsonResponse
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.password_validation import validate_password
-from django.contrib.auth.hashers import make_password
-from django.core.exceptions import ValidationError
-from django.core.validators import validate_email
-from django.core.files.storage import default_storage
-from django.utils import timezone
-from django.views.decorators.http import require_POST
-from django.db import transaction
-
-from .models import Profile, SavedAddress, EmailOTP
-
 
 logger = logging.getLogger(__name__)
 
@@ -48,9 +35,10 @@ def send_email_otp(email, purpose, pending_data=None):
     
     now = timezone.now()
 
-    # Check Gmail configuration
-    if not settings.EMAIL_HOST_USER or not settings.EMAIL_HOST_PASSWORD:
-        logger.error("Gmail email configuration is missing.")
+    api_key = os.environ.get("BREVO_API_KEY", "")
+
+    if not api_key:
+        logger.error("Brevo API key is missing.")
         return False, "Email service is not configured. Please try again later."
 
     existing_otp = EmailOTP.objects.filter(
@@ -111,19 +99,40 @@ def send_email_otp(email, purpose, pending_data=None):
         </div>
         """
 
-        email_message = EmailMultiAlternatives(
-            subject=subject,
-            body=text_message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[email]
+        payload = {
+            "sender": {
+                "email": settings.EMAIL_HOST_USER,
+                "name": "FoodKart"
+            },
+            "to": [
+                {
+                    "email": email
+                }
+            ],
+            "subject": subject,
+            "textContent": text_message,
+            "htmlContent": html_message
+        }
+
+        request_data = json.dumps(payload).encode("utf-8")
+
+        req = urllib.request.Request(
+            "https://api.brevo.com/v3/smtp/email",
+            data=request_data,
+            headers={
+                "api-key": api_key,
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            method="POST"
         )
 
-        email_message.attach_alternative(
-            html_message,
-            "text/html"
-        )
+        with urllib.request.urlopen(req, timeout=20) as response:
 
-        email_message.send(fail_silently=False)
+            if response.status not in (200, 201, 202):
+                raise Exception(
+                    f"Brevo returned status {response.status}"
+                )
 
         logger.info("OTP email successfully sent to %s", email)
 
@@ -131,54 +140,11 @@ def send_email_otp(email, purpose, pending_data=None):
 
     except Exception as error:
 
-        logger.exception("Gmail OTP email sending failed: %s", error)
+        logger.exception("Brevo OTP email sending failed: %s", error)   
 
         otp_record.delete()
 
         return False, "Unable to send OTP. Please try again."
-
-def check_email_otp(email, purpose, entered_otp):
-
-    otp_record = EmailOTP.objects.filter(
-        email=email,
-        purpose=purpose
-    ).first()
-
-    if not otp_record:
-        return False, "OTP not found. Please request a new OTP.", None
-
-    if timezone.now() >= otp_record.expires_at:
-
-        otp_record.delete()
-
-        return False, "OTP expired. Please request a new OTP.", None
-
-    if otp_record.attempts >= settings.OTP_MAX_ATTEMPTS:
-
-        otp_record.delete()
-
-        return False, "Maximum OTP attempts exceeded. Request a new OTP.", None
-
-    if not secrets.compare_digest(
-        hash_otp(entered_otp),
-        otp_record.otp_hash
-    ):
-
-        otp_record.attempts += 1
-        otp_record.save(update_fields=["attempts"])
-
-        if otp_record.attempts >= settings.OTP_MAX_ATTEMPTS:
-
-            otp_record.delete()
-
-            return False, "Maximum OTP attempts exceeded. Request a new OTP.", None
-
-        remaining = settings.OTP_MAX_ATTEMPTS - otp_record.attempts
-
-        return False, f"Incorrect OTP. {remaining} attempts remaining.", None
-
-    return True, "OTP verified successfully.", otp_record
-
 
 # =====================================================
 # LOGIN, SIGNUP AND PASSWORD RESET
