@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
+
 <body>
 
     {% if default_address %}
@@ -29,29 +30,68 @@
     <!-- NAVBAR -->
     <header>
         <nav class="navbar">
+
             <div class="nav-logo">
-                <a href="{% url 'home' %}" class="logo" id="logoLink">Food<span>Kart .</span></a>
+                <a href="{% url 'home' %}" class="logo" id="logoLink">
+                    Food<span>Kart .</span>
+                </a>
             </div>
 
-            <div class="nav-menu">
+            <div class="nav-menu" id="navMenu">
                 <ol>
-                    <li><a href="#" id="homeLink" class="nav-link active"><i class="fa-solid fa-house"></i> Home</a></li>
-                    <li><a href="#" id="restaurantLink" class="nav-link"><i class="fa-solid fa-utensils"></i> Restaurants</a></li>
-                    <li><a href="#" id="categoryLink" class="nav-link"><i class="fa-solid fa-layer-group"></i> Categories</a></li>
-                    <li><a href="#" class="cart-button" id="cartButton"><i class="fa-solid fa-cart-shopping"></i> Cart<span id="cartCount">0</span></a></li>
+                    <li>
+                        <a href="#" id="homeLink" class="nav-link active">
+                            <i class="fa-solid fa-house"></i> Home
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#" id="restaurantLink" class="nav-link">
+                            <i class="fa-solid fa-utensils"></i> Restaurants
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#" id="categoryLink" class="nav-link">
+                            <i class="fa-solid fa-layer-group"></i> Categories
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#" class="cart-button" id="cartButton">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            Cart
+                            <span id="cartCount">0</span>
+                        </a>
+                    </li>
+
                     <li>
                         <a href="#" class="nav-location" id="navLocationButton">
                             <i class="fa-solid fa-location-dot"></i>
+
                             <span class="nav-location-details">
                                 <span class="nav-location-label">Delivering to</span>
-                                <span class="nav-location-name" id="navLocationText">Select your location</span>
+                                <span class="nav-location-name" id="navLocationText">
+                                    Select your location
+                                </span>
                             </span>
+
                             <i class="fa-solid fa-chevron-down"></i>
                         </a>
                     </li>
-                    <li><a href="#" id="profileLink" class="profile-nav">Profile <i class="fa-solid fa-user"></i></a></li>
+
+                    <li>
+                        <a href="#" id="profileLink" class="profile-nav">
+                            Profile <i class="fa-solid fa-user"></i>
+                        </a>
+                    </li>
                 </ol>
             </div>
+
+            <button type="button" class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
         </nav>
     </header>
 
@@ -60,39 +100,110 @@
 
         <!-- HERO -->
         <section class="hero">
+
             <div class="hero-content">
                 <span class="hero-tag">🍃 Fresh Food, Happy Life</span>
-                <h1>Delicious Food Delivered <span>To Your Doorstep</span></h1>
-                <p>Discover the best restaurants and order your favourite food.</p>
+
+                <h1>
+                    Delicious Food Delivered
+                    <span>To Your Doorstep</span>
+                </h1>
+
+                <p>
+                    Discover the best restaurants and order your favourite food.
+                </p>
             </div>
 
             <div class="hero-search">
                 <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="Search restaurants or food..." autocomplete="off">
-                    <button id="searchButton">Search</button>
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="Search restaurants or food..."
+                        autocomplete="off">
+
+                    <button type="button" id="searchButton">
+                        Search
+                    </button>
                 </div>
+
                 <div class="search-suggestions" id="searchSuggestions"></div>
             </div>
+
         </section>
 
-        <!-- CATEGORIES -->
+        <!-- CATEGORIES WITH LEFT AND RIGHT SLIDER -->
         <section class="category-content" id="categoriesSection">
+
             <h2>Explore Categories</h2>
             <p>Find your favourite food</p>
 
-            <div class="category-list">
-                <div class="category-card active" data-category="all"><div class="category-icon">🍽️</div><h3>All</h3></div>
-                <div class="category-card" data-category="biryani"><div class="category-icon">🍛</div><h3>Biryani</h3></div>
-                <div class="category-card" data-category="pizza"><div class="category-icon">🍕</div><h3>Pizza</h3></div>
-                <div class="category-card" data-category="burger"><div class="category-icon">🍔</div><h3>Burger</h3></div>
-                <div class="category-card" data-category="chicken"><div class="category-icon">🍗</div><h3>Chicken</h3></div>
-                <div class="category-card" data-category="noodles"><div class="category-icon">🍜</div><h3>Noodles</h3></div>
-                <div class="category-card" data-category="ice-cream"><div class="category-icon">🍦</div><h3>Ice Cream</h3></div>
+            <div class="category-slider-wrapper">
+
+                <button
+                    type="button"
+                    class="category-arrow category-arrow-left"
+                    id="categoryLeft"
+                    aria-label="Scroll categories left">
+
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+
+                <div class="category-list" id="categoryList">
+
+                    <div class="category-card active" data-category="all">
+                        <div class="category-icon">🍽️</div>
+                        <h3>All</h3>
+                    </div>
+
+                    <div class="category-card" data-category="biryani">
+                        <div class="category-icon">🍛</div>
+                        <h3>Biryani</h3>
+                    </div>
+
+                    <div class="category-card" data-category="pizza">
+                        <div class="category-icon">🍕</div>
+                        <h3>Pizza</h3>
+                    </div>
+
+                    <div class="category-card" data-category="burger">
+                        <div class="category-icon">🍔</div>
+                        <h3>Burger</h3>
+                    </div>
+
+                    <div class="category-card" data-category="chicken">
+                        <div class="category-icon">🍗</div>
+                        <h3>Chicken</h3>
+                    </div>
+
+                    <div class="category-card" data-category="noodles">
+                        <div class="category-icon">🍜</div>
+                        <h3>Noodles</h3>
+                    </div>
+
+                    <div class="category-card" data-category="ice-cream">
+                        <div class="category-icon">🍦</div>
+                        <h3>Ice Cream</h3>
+                    </div>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="category-arrow category-arrow-right"
+                    id="categoryRight"
+                    aria-label="Scroll categories right">
+
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+
             </div>
+
         </section>
 
         <!-- OFFERS -->
         <section class="section">
+
             <div class="section-heading">
                 <div>
                     <h2>Special Offers</h2>
@@ -101,26 +212,32 @@
             </div>
 
             <div class="offers-grid">
+
                 <div class="offer-card offer-one">
                     <small>WELCOME OFFER</small>
                     <h3>50% OFF</h3>
                     <p>On your first order with FoodKart</p>
                 </div>
+
                 <div class="offer-card offer-two">
                     <small>WEEKEND SPECIAL</small>
                     <h3>Free Delivery</h3>
                     <p>Enjoy free delivery on selected orders</p>
                 </div>
+
                 <div class="offer-card offer-three">
                     <small>FOODKART DEAL</small>
                     <h3>Buy 1 Get 1</h3>
                     <p>Enjoy more food with your friends</p>
                 </div>
+
             </div>
+
         </section>
 
         <!-- RESTAURANTS -->
         <section class="section" id="restaurantsSection">
+
             <div class="section-heading">
                 <div>
                     <h2>Popular Restaurants</h2>
@@ -138,7 +255,10 @@
                     <div class="restaurant-info">
                         <h3>Paradise Biryani</h3>
                         <p>Authentic Hyderabadi biryani</p>
-                        <div class="restaurant-meta"><span>⭐ 4.8</span><span>30-35 min</span></div>
+                        <div class="restaurant-meta">
+                            <span>⭐ 4.8</span>
+                            <span>30-35 min</span>
+                        </div>
                     </div>
                 </article>
 
@@ -150,7 +270,10 @@
                     <div class="restaurant-info">
                         <h3>Pizza Palace</h3>
                         <p>Delicious cheesy pizzas</p>
-                        <div class="restaurant-meta"><span>⭐ 4.5</span><span>25-30 min</span></div>
+                        <div class="restaurant-meta">
+                            <span>⭐ 4.5</span>
+                            <span>25-30 min</span>
+                        </div>
                     </div>
                 </article>
 
@@ -162,7 +285,10 @@
                     <div class="restaurant-info">
                         <h3>Burger House</h3>
                         <p>Juicy and tasty burgers</p>
-                        <div class="restaurant-meta"><span>⭐ 4.4</span><span>20-25 min</span></div>
+                        <div class="restaurant-meta">
+                            <span>⭐ 4.4</span>
+                            <span>20-25 min</span>
+                        </div>
                     </div>
                 </article>
 
@@ -174,7 +300,10 @@
                     <div class="restaurant-info">
                         <h3>Sweet Treats</h3>
                         <p>Sweet desserts and treats</p>
-                        <div class="restaurant-meta"><span>⭐ 4.6</span><span>15-20 min</span></div>
+                        <div class="restaurant-meta">
+                            <span>⭐ 4.6</span>
+                            <span>15-20 min</span>
+                        </div>
                     </div>
                 </article>
 
@@ -186,7 +315,10 @@
                     <div class="restaurant-info">
                         <h3>Chicken Corner</h3>
                         <p>Hot and crispy chicken</p>
-                        <div class="restaurant-meta"><span>⭐ 4.5</span><span>25-30 min</span></div>
+                        <div class="restaurant-meta">
+                            <span>⭐ 4.5</span>
+                            <span>25-30 min</span>
+                        </div>
                     </div>
                 </article>
 
@@ -198,7 +330,10 @@
                     <div class="restaurant-info">
                         <h3>Royal Biryani</h3>
                         <p>Premium biryani varieties</p>
-                        <div class="restaurant-meta"><span>⭐ 4.7</span><span>30-35 min</span></div>
+                        <div class="restaurant-meta">
+                            <span>⭐ 4.7</span>
+                            <span>30-35 min</span>
+                        </div>
                     </div>
                 </article>
 
@@ -210,7 +345,10 @@
                     <div class="restaurant-info">
                         <h3>South Spice</h3>
                         <p>Traditional dosa and idli</p>
-                        <div class="restaurant-meta"><span>⭐ 4.3</span><span>20-25 min</span></div>
+                        <div class="restaurant-meta">
+                            <span>⭐ 4.3</span>
+                            <span>20-25 min</span>
+                        </div>
                     </div>
                 </article>
 
@@ -222,7 +360,10 @@
                     <div class="restaurant-info">
                         <h3>Chinese Wok</h3>
                         <p>Delicious Chinese cuisine</p>
-                        <div class="restaurant-meta"><span>⭐ 4.4</span><span>25-30 min</span></div>
+                        <div class="restaurant-meta">
+                            <span>⭐ 4.4</span>
+                            <span>25-30 min</span>
+                        </div>
                     </div>
                 </article>
 
@@ -234,7 +375,10 @@
                     <div class="restaurant-info">
                         <h3>Rolls & Wraps</h3>
                         <p>Fresh and flavorful rolls</p>
-                        <div class="restaurant-meta"><span>⭐ 4.2</span><span>20-25 min</span></div>
+                        <div class="restaurant-meta">
+                            <span>⭐ 4.2</span>
+                            <span>20-25 min</span>
+                        </div>
                     </div>
                 </article>
 
@@ -246,7 +390,10 @@
                     <div class="restaurant-info">
                         <h3>Kebab Junction</h3>
                         <p>Smoky and spicy kebabs</p>
-                        <div class="restaurant-meta"><span>⭐ 4.6</span><span>30-35 min</span></div>
+                        <div class="restaurant-meta">
+                            <span>⭐ 4.6</span>
+                            <span>30-35 min</span>
+                        </div>
                     </div>
                 </article>
 
@@ -258,7 +405,10 @@
                     <div class="restaurant-info">
                         <h3>Cafe Coffee House</h3>
                         <p>Coffee, snacks and desserts</p>
-                        <div class="restaurant-meta"><span>⭐ 4.5</span><span>15-20 min</span></div>
+                        <div class="restaurant-meta">
+                            <span>⭐ 4.5</span>
+                            <span>15-20 min</span>
+                        </div>
                     </div>
                 </article>
 
@@ -270,7 +420,10 @@
                     <div class="restaurant-info">
                         <h3>Italian Kitchen</h3>
                         <p>Authentic Italian flavors</p>
-                        <div class="restaurant-meta"><span>⭐ 4.4</span><span>25-30 min</span></div>
+                        <div class="restaurant-meta">
+                            <span>⭐ 4.4</span>
+                            <span>25-30 min</span>
+                        </div>
                     </div>
                 </article>
 
@@ -282,7 +435,10 @@
                     <div class="restaurant-info">
                         <h3>Sandwich Station</h3>
                         <p>Freshly made sandwiches</p>
-                        <div class="restaurant-meta"><span>⭐ 4.3</span><span>15-20 min</span></div>
+                        <div class="restaurant-meta">
+                            <span>⭐ 4.3</span>
+                            <span>15-20 min</span>
+                        </div>
                     </div>
                 </article>
 
@@ -294,7 +450,10 @@
                     <div class="restaurant-info">
                         <h3>Ocean Seafood</h3>
                         <p>Fresh seafood specialties</p>
-                        <div class="restaurant-meta"><span>⭐ 4.6</span><span>30-35 min</span></div>
+                        <div class="restaurant-meta">
+                            <span>⭐ 4.6</span>
+                            <span>30-35 min</span>
+                        </div>
                     </div>
                 </article>
 
@@ -306,7 +465,10 @@
                     <div class="restaurant-info">
                         <h3>Royal Thali House</h3>
                         <p>Complete Indian meals</p>
-                        <div class="restaurant-meta"><span>⭐ 4.5</span><span>25-30 min</span></div>
+                        <div class="restaurant-meta">
+                            <span>⭐ 4.5</span>
+                            <span>25-30 min</span>
+                        </div>
                     </div>
                 </article>
 
@@ -318,7 +480,10 @@
                     <div class="restaurant-info">
                         <h3>Momo Street</h3>
                         <p>Steamed and fried momos</p>
-                        <div class="restaurant-meta"><span>⭐ 4.3</span><span>20-25 min</span></div>
+                        <div class="restaurant-meta">
+                            <span>⭐ 4.3</span>
+                            <span>20-25 min</span>
+                        </div>
                     </div>
                 </article>
 
@@ -330,7 +495,10 @@
                     <div class="restaurant-info">
                         <h3>Shawarma Point</h3>
                         <p>Fresh and spicy shawarma</p>
-                        <div class="restaurant-meta"><span>⭐ 4.5</span><span>20-25 min</span></div>
+                        <div class="restaurant-meta">
+                            <span>⭐ 4.5</span>
+                            <span>20-25 min</span>
+                        </div>
                     </div>
                 </article>
 
@@ -342,7 +510,10 @@
                     <div class="restaurant-info">
                         <h3>Fresh Bake Bakery</h3>
                         <p>Freshly baked cakes and bread</p>
-                        <div class="restaurant-meta"><span>⭐ 4.4</span><span>15-20 min</span></div>
+                        <div class="restaurant-meta">
+                            <span>⭐ 4.4</span>
+                            <span>15-20 min</span>
+                        </div>
                     </div>
                 </article>
 
@@ -354,7 +525,10 @@
                     <div class="restaurant-info">
                         <h3>Ice Cream World</h3>
                         <p>Delicious ice cream flavors</p>
-                        <div class="restaurant-meta"><span>⭐ 4.7</span><span>15-20 min</span></div>
+                        <div class="restaurant-meta">
+                            <span>⭐ 4.7</span>
+                            <span>15-20 min</span>
+                        </div>
                     </div>
                 </article>
 
@@ -366,7 +540,10 @@
                     <div class="restaurant-info">
                         <h3>Street Food Hub</h3>
                         <p>Popular street food favorites</p>
-                        <div class="restaurant-meta"><span>⭐ 4.3</span><span>20-25 min</span></div>
+                        <div class="restaurant-meta">
+                            <span>⭐ 4.3</span>
+                            <span>20-25 min</span>
+                        </div>
                     </div>
                 </article>
 
@@ -378,7 +555,10 @@
                     <div class="restaurant-info">
                         <h3>Healthy Bowl</h3>
                         <p>Fresh and healthy meals</p>
-                        <div class="restaurant-meta"><span>⭐ 4.5</span><span>20-25 min</span></div>
+                        <div class="restaurant-meta">
+                            <span>⭐ 4.5</span>
+                            <span>20-25 min</span>
+                        </div>
                     </div>
                 </article>
 
@@ -390,7 +570,10 @@
                     <div class="restaurant-info">
                         <h3>Tandoori House</h3>
                         <p>Authentic tandoori specialties</p>
-                        <div class="restaurant-meta"><span>⭐ 4.6</span><span>30-35 min</span></div>
+                        <div class="restaurant-meta">
+                            <span>⭐ 4.6</span>
+                            <span>30-35 min</span>
+                        </div>
                     </div>
                 </article>
 
@@ -402,16 +585,21 @@
                     <div class="restaurant-info">
                         <h3>Noodle Express</h3>
                         <p>Hot and flavorful noodles</p>
-                        <div class="restaurant-meta"><span>⭐ 4.4</span><span>20-25 min</span></div>
+                        <div class="restaurant-meta">
+                            <span>⭐ 4.4</span>
+                            <span>20-25 min</span>
+                        </div>
                     </div>
                 </article>
 
             </div>
         </section>
+
     </main>
 
     <!-- FOODKART LOCATION / MAP -->
     <section class="food-location-section" id="foodLocationSection" hidden>
+
         <div class="location-heading">
             <span class="location-badge">📍 FOODKART DELIVERY</span>
             <h2>Find Food Around You</h2>
@@ -419,25 +607,44 @@
         </div>
 
         <div class="location-container">
+
             <div class="location-sidebar">
+
                 <h3>Where are you hungry?</h3>
                 <p>Choose your delivery location</p>
 
                 <div class="map-search-box">
-                    <input type="text" id="mapSearchInput" placeholder="Enter your location...">
-                    <button id="mapSearchButton">🔍</button>
+                    <input
+                        type="text"
+                        id="mapSearchInput"
+                        placeholder="Enter your location...">
+
+                    <button type="button" id="mapSearchButton">
+                        🔍
+                    </button>
                 </div>
 
-                <button class="current-location-button" id="currentLocationButton">📍 Use My Current Location</button>
-
+                <button
+                    type="button"
+                    class="current-location-button"
+                    id="currentLocationButton">
+                    📍 Use My Current Location
+                </button>
 
                 <div class="selected-location-card">
+
                     <span>📌 Selected Location</span>
-                    <h4 id="selectedLocationText">Choose your location</h4>
+
+                    <h4 id="selectedLocationText">
+                        Choose your location
+                    </h4>
 
                     {% if user.is_authenticated %}
                     <div class="save-address-controls">
-                        <label for="savedAddressType">Save address as</label>
+
+                        <label for="savedAddressType">
+                            Save address as
+                        </label>
 
                         <select id="savedAddressType">
                             <option value="Home">Home</option>
@@ -449,80 +656,160 @@
                             type="button"
                             id="saveSelectedAddressButton"
                             data-save-url="{% url 'save_address' %}">
+
                             <i class="fa-solid fa-floppy-disk"></i>
                             Save Address
                         </button>
+
                     </div>
                     {% endif %}
+
                 </div>
+
             </div>
 
             <div class="food-map-wrapper">
+
                 <div class="map-top-label">
                     <span>🍔</span>
                     <span>FoodKart Map</span>
                     <span class="map-live-badge">Explore</span>
                 </div>
+
                 <div id="foodKartMap"></div>
+
             </div>
+
         </div>
+
     </section>
 
     <!-- MENU PAGE -->
     <main id="menuPage" class="section" hidden>
+
         <div class="page-top">
+
             <div>
                 <h2 id="menuRestaurantName">Restaurant Menu</h2>
-                <p style="color:var(--muted);margin-top:7px;">Choose your favourite items</p>
+                <p style="color:var(--muted);margin-top:7px;">
+                    Choose your favourite items
+                </p>
             </div>
-            <button class="back-button" id="backToRestaurants">← Back to Restaurants</button>
+
+            <button
+                type="button"
+                class="back-button"
+                id="backToRestaurants">
+                ← Back to Restaurants
+            </button>
+
         </div>
+
         <div class="menu-grid" id="menuGrid"></div>
+
     </main>
 
     <!-- PROFILE DASHBOARD -->
     <main id="profilePage" class="account-dashboard" hidden>
+
         {% if user.is_authenticated %}
+
         <div class="account-layout">
 
             <!-- SIDEBAR -->
             <aside class="account-sidebar">
+
                 <div class="account-sidebar-header">
-                    <h2><i class="fa-solid fa-user-circle"></i> My Account</h2>
+                    <h2>
+                        <i class="fa-solid fa-user-circle"></i>
+                        My Account
+                    </h2>
                     <p>Manage your FoodKart account</p>
                 </div>
 
                 <div class="account-user-mini">
+
                     <img
                         src="{% if user.profile.profile_picture %}{{ user.profile.profile_picture.url }}{% else %}{% static 'default-profile.png' %}{% endif %}"
                         alt="Profile Picture"
                         id="accountSidebarImage">
+
                     <div>
-                        <h3>{{ user.profile.name|default:user.get_full_name|default:user.username }}</h3>
+                        <h3>
+                            {{ user.profile.name|default:user.get_full_name|default:user.username }}
+                        </h3>
                         <p>{{ user.email }}</p>
                     </div>
+
                 </div>
 
                 <nav class="account-sidebar-nav">
-                    <button class="account-nav-item active" data-tab="profileOverview"><i class="fa-solid fa-user"></i><span>My Profile</span></button>
-                    <button class="account-nav-item" data-tab="myOrdersTab"><i class="fa-solid fa-bag-shopping"></i><span>My Orders</span></button>
-                    <button class="account-nav-item" data-tab="myAddressesTab"><i class="fa-solid fa-location-dot"></i><span>My Addresses</span></button>
-                    <button class="account-nav-item" data-tab="myPaymentsTab"><i class="fa-solid fa-credit-card"></i><span>Payments</span></button>
-                    <button class="account-nav-item" data-tab="mySecurityTab"><i class="fa-solid fa-shield-halved"></i><span>Security</span></button>
-                    <button class="account-nav-item" data-tab="mySettingsTab"><i class="fa-solid fa-gear"></i><span>Settings</span></button>
+
+                    <button class="account-nav-item active" data-tab="profileOverview">
+                        <i class="fa-solid fa-user"></i>
+                        <span>My Profile</span>
+                    </button>
+
+                    <button class="account-nav-item" data-tab="myOrdersTab">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        <span>My Orders</span>
+                    </button>
+
+                    <button class="account-nav-item" data-tab="myAddressesTab">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span>My Addresses</span>
+                    </button>
+
+                    <button class="account-nav-item" data-tab="myPaymentsTab">
+                        <i class="fa-solid fa-credit-card"></i>
+                        <span>Payments</span>
+                    </button>
+
+                    <button class="account-nav-item" data-tab="mySecurityTab">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span>Security</span>
+                    </button>
+
+                    <button class="account-nav-item" data-tab="mySettingsTab">
+                        <i class="fa-solid fa-gear"></i>
+                        <span>Settings</span>
+                    </button>
+
                 </nav>
 
                 <div class="account-sidebar-bottom">
-                    <form method="POST" action="{% url 'delete_account' %}" class="delete-account-form" onsubmit="return confirm('Are you sure you want to permanently delete your account? This action cannot be undone.');">
+
+                    <form
+                        method="POST"
+                        action="{% url 'delete_account' %}"
+                        class="delete-account-form"
+                        onsubmit="return confirm('Are you sure you want to permanently delete your account? This action cannot be undone.');">
+
                         {% csrf_token %}
-                        <button type="submit" class="account-delete-button"><i class="fa-solid fa-trash-can"></i> Delete Account Permanently</button>
+
+                        <button type="submit" class="account-delete-button">
+                            <i class="fa-solid fa-trash-can"></i>
+                            Delete Account Permanently
+                        </button>
+
                     </form>
 
-                    <form method="POST" action="{% url 'logout' %}" class="logout-form">
+                    <form
+                        method="POST"
+                        action="{% url 'logout' %}"
+                        class="logout-form">
+
                         {% csrf_token %}
-                        <button type="submit" class="account-logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+
+                        <button type="submit" class="account-logout">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            Logout
+                        </button>
+
                     </form>
+
                 </div>
+
             </aside>
 
             <!-- DASHBOARD CONTENT -->
@@ -530,36 +817,70 @@
 
                 <!-- PROFILE OVERVIEW -->
                 <div class="account-tab active" id="profileOverview">
+
                     <div class="account-welcome-banner">
+
                         <div>
                             <span class="welcome-small">FOODKART ACCOUNT</span>
-                            <h1>Welcome, {{ user.profile.name|default:user.get_full_name|default:user.username }} 👋</h1>
-                            <p>Manage your profile and enjoy your favourite food.</p>
+
+                            <h1>
+                                Welcome,
+                                {{ user.profile.name|default:user.get_full_name|default:user.username }}
+                                👋
+                            </h1>
+
+                            <p>
+                                Manage your profile and enjoy your favourite food.
+                            </p>
                         </div>
-                        <div class="welcome-icon"><i class="fa-solid fa-bowl-food"></i></div>
+
+                        <div class="welcome-icon">
+                            <i class="fa-solid fa-bowl-food"></i>
+                        </div>
+
                     </div>
 
                     <!-- QUICK ACCESS -->
                     <div class="quick-access-grid">
+
                         <button class="quick-access-card" data-tab="myOrdersTab">
-                            <div class="quick-access-icon orange"><i class="fa-solid fa-bag-shopping"></i></div>
-                            <div><h3>My Orders</h3><p>Track your orders</p></div>
+                            <div class="quick-access-icon orange">
+                                <i class="fa-solid fa-bag-shopping"></i>
+                            </div>
+                            <div>
+                                <h3>My Orders</h3>
+                                <p>Track your orders</p>
+                            </div>
                             <i class="fa-solid fa-chevron-right"></i>
                         </button>
+
                         <button class="quick-access-card" data-tab="myAddressesTab">
-                            <div class="quick-access-icon green"><i class="fa-solid fa-location-dot"></i></div>
-                            <div><h3>My Addresses</h3><p>Manage delivery addresses</p></div>
+                            <div class="quick-access-icon green">
+                                <i class="fa-solid fa-location-dot"></i>
+                            </div>
+                            <div>
+                                <h3>My Addresses</h3>
+                                <p>Manage delivery addresses</p>
+                            </div>
                             <i class="fa-solid fa-chevron-right"></i>
                         </button>
+
                         <button class="quick-access-card" data-tab="myPaymentsTab">
-                            <div class="quick-access-icon blue"><i class="fa-solid fa-wallet"></i></div>
-                            <div><h3>Payments</h3><p>Payment preferences</p></div>
+                            <div class="quick-access-icon blue">
+                                <i class="fa-solid fa-wallet"></i>
+                            </div>
+                            <div>
+                                <h3>Payments</h3>
+                                <p>Payment preferences</p>
+                            </div>
                             <i class="fa-solid fa-chevron-right"></i>
                         </button>
+
                     </div>
 
                     <!-- PERSONAL INFORMATION -->
                     <div class="account-panel">
+
                         <div class="account-panel-heading">
                             <div>
                                 <h2>Personal Information</h2>
@@ -567,59 +888,115 @@
                             </div>
                         </div>
 
-                        <form method="POST" action="{% url 'profile' %}" enctype="multipart/form-data" class="account-profile-form">
+                        <form
+                            method="POST"
+                            action="{% url 'profile' %}"
+                            enctype="multipart/form-data"
+                            class="account-profile-form">
+
                             {% csrf_token %}
 
                             <div class="account-profile-photo-section">
+
                                 <div class="account-photo-wrapper">
+
                                     <img
                                         id="accountProfileImage"
                                         src="{% if user.profile.profile_picture %}{{ user.profile.profile_picture.url }}{% else %}{% static 'default-profile.png' %}{% endif %}"
                                         alt="Profile Picture">
-                                    <label for="accountPhotoInput" class="account-photo-edit"><i class="fa-solid fa-camera"></i></label>
+
+                                    <label
+                                        for="accountPhotoInput"
+                                        class="account-photo-edit">
+                                        <i class="fa-solid fa-camera"></i>
+                                    </label>
+
                                 </div>
 
                                 <div class="account-photo-info">
-                                    <h3>{{ user.profile.name|default:user.get_full_name|default:user.username }}</h3>
+
+                                    <h3>
+                                        {{ user.profile.name|default:user.get_full_name|default:user.username }}
+                                    </h3>
+
                                     <p>Upload a profile picture</p>
-                                    <label for="accountPhotoInput" class="account-upload-button"><i class="fa-solid fa-upload"></i> Change Photo</label>
-                                    <input type="file" id="accountPhotoInput" name="profile_picture" accept="image/*" hidden>
+
+                                    <label
+                                        for="accountPhotoInput"
+                                        class="account-upload-button">
+                                        <i class="fa-solid fa-upload"></i>
+                                        Change Photo
+                                    </label>
+
+                                    <input
+                                        type="file"
+                                        id="accountPhotoInput"
+                                        name="profile_picture"
+                                        accept="image/*"
+                                        hidden>
+
                                 </div>
+
                             </div>
 
                             <div class="account-information-grid">
+
                                 <div class="account-info-field">
                                     <label for="profileName">Full Name</label>
-                                    <input type="text" id="profileName" name="name" value="{{ user.profile.name|default:user.get_full_name }}" maxlength="100" required>
+                                    <input
+                                        type="text"
+                                        id="profileName"
+                                        name="name"
+                                        value="{{ user.profile.name|default:user.get_full_name }}"
+                                        maxlength="100"
+                                        required>
                                 </div>
 
                                 <div class="account-info-field">
                                     <label for="profileEmail">Email Address</label>
-                                    <input type="email" id="profileEmail" name="email" value="{{ user.email }}" required>
+                                    <input
+                                        type="email"
+                                        id="profileEmail"
+                                        name="email"
+                                        value="{{ user.email }}"
+                                        required>
                                 </div>
 
                                 <div class="account-info-field">
                                     <label for="profilePhone">Phone Number</label>
-                                    <input type="tel" id="profilePhone" name="phone" value="{{ user.profile.phone|default:'' }}" maxlength="15" required>
+                                    <input
+                                        type="tel"
+                                        id="profilePhone"
+                                        name="phone"
+                                        value="{{ user.profile.phone|default:'' }}"
+                                        maxlength="15"
+                                        required>
                                 </div>
 
                                 <div class="account-info-field">
                                     <label>Account Status</label>
+
                                     <div class="account-info-value account-status">
                                         <i class="fa-solid fa-circle-check"></i>
                                         <span>Active Account</span>
                                     </div>
                                 </div>
+
                             </div>
 
                             <div class="account-profile-actions">
-                                <button type="submit" class="account-upload-button">Save Profile</button>
+                                <button type="submit" class="account-upload-button">
+                                    Save Profile
+                                </button>
                             </div>
+
                         </form>
+
                     </div>
 
                     <!-- ACCOUNT PREFERENCES -->
                     <div class="account-panel">
+
                         <div class="account-panel-heading">
                             <div>
                                 <h2>Account Preferences</h2>
@@ -628,23 +1005,34 @@
                         </div>
 
                         <div class="account-preference-row">
+
                             <div class="account-preference-info">
-                                <div class="preference-icon"><i class="fa-solid fa-moon"></i></div>
+
+                                <div class="preference-icon">
+                                    <i class="fa-solid fa-moon"></i>
+                                </div>
+
                                 <div>
                                     <h3>Appearance</h3>
                                     <p>Switch between light and dark mode</p>
                                 </div>
+
                             </div>
-                            <button id="themeToggle" class="theme-toggle-button">
+
+                            <button type="button" id="themeToggle" class="theme-toggle-button">
                                 <i id="themeIcon" class="fa-solid fa-moon"></i>
                                 <span id="themeText">Dark Mode</span>
                             </button>
+
                         </div>
+
                     </div>
+
                 </div>
-                                                
+
                 <!-- MY ORDERS -->
                 <div class="account-tab" id="myOrdersTab">
+
                     <div class="account-panel">
 
                         <div class="account-panel-heading">
@@ -655,12 +1043,15 @@
                         </div>
 
                         {% if orders %}
+
                         <div class="my-orders-list">
 
                             {% for order in orders %}
+
                             <div class="my-order-card">
 
                                 <div class="my-order-header">
+
                                     <div>
                                         <span class="order-label">ORDER ID</span>
                                         <h3>#{{ order.order_id }}</h3>
@@ -669,10 +1060,11 @@
                                     <span class="order-status">
                                         {{ order.status }}
                                     </span>
+
                                 </div>
 
-
                                 {% if order.status == "Placed" or order.status == "Confirmed" %}
+
                                 <button
                                     type="button"
                                     class="cancel-order-button"
@@ -680,17 +1072,20 @@
 
                                     <i class="fa-solid fa-xmark"></i>
                                     Cancel Order
+
                                 </button>
+
                                 {% endif %}
 
-
                                 <div class="my-order-items">
+
                                     {% for item in order.items %}
-                                    
+
                                     <div class="my-order-item">
 
                                         <div class="order-item-image">
-                                            <img src="{{ item.image }}"
+                                            <img
+                                                src="{{ item.image }}"
                                                 alt="{{ item.name }}"
                                                 onerror="this.style.display='none'">
                                         </div>
@@ -705,7 +1100,9 @@
                                         </div>
 
                                     </div>
+
                                     {% endfor %}
+
                                 </div>
 
                                 <div class="my-order-total">
@@ -714,6 +1111,7 @@
                                 </div>
 
                                 <div class="my-order-info">
+
                                     <p>
                                         <i class="fa-solid fa-location-dot"></i>
                                         {{ order.delivery_address }}
@@ -723,29 +1121,36 @@
                                         <i class="fa-regular fa-clock"></i>
                                         {{ order.created_at|date:"d M Y, h:i A" }}
                                     </p>
+
                                 </div>
 
                             </div>
+
                             {% endfor %}
 
                         </div>
 
                         {% else %}
+
                         <div class="account-empty-state">
                             <i class="fa-solid fa-bag-shopping"></i>
                             <h3>No orders yet</h3>
                             <p>Your food orders will appear here.</p>
                         </div>
+
                         {% endif %}
 
                     </div>
+
                 </div>
-                
+
                 <!-- ADDRESSES -->
                 <div class="account-tab" id="myAddressesTab">
+
                     <div class="account-panel">
 
                         <div class="account-panel-heading">
+
                             <div>
                                 <h2>My Addresses</h2>
                                 <p>Manage your delivery locations</p>
@@ -755,9 +1160,12 @@
                                 class="account-add-button"
                                 id="addAddressButton"
                                 type="button">
+
                                 <i class="fa-solid fa-plus"></i>
                                 Add Address
+
                             </button>
+
                         </div>
 
                         {% if saved_addresses %}
@@ -771,6 +1179,7 @@
                                 <div class="saved-address-header">
 
                                     <div class="saved-address-type">
+
                                         {% if address.address_type == "Home" %}
                                             <i class="fa-solid fa-house"></i>
                                         {% elif address.address_type == "Work" %}
@@ -780,13 +1189,16 @@
                                         {% endif %}
 
                                         <h3>{{ address.address_type }}</h3>
+
                                     </div>
 
                                     {% if address.is_default %}
+
                                     <span class="default-address-badge">
                                         <i class="fa-solid fa-circle-check"></i>
                                         Default
                                     </span>
+
                                     {% endif %}
 
                                 </div>
@@ -796,38 +1208,49 @@
                                 </p>
 
                                 {% if address.latitude and address.longitude %}
+
                                 <p class="saved-address-coordinates">
                                     <i class="fa-solid fa-location-crosshairs"></i>
                                     {{ address.latitude }}, {{ address.longitude }}
                                 </p>
+
                                 {% endif %}
 
                                 <div class="saved-address-actions">
+
                                     <button
                                         type="button"
                                         class="use-saved-address-button"
                                         data-address="{{ address.address }}"
                                         data-latitude="{{ address.latitude|default_if_none:'' }}"
                                         data-longitude="{{ address.longitude|default_if_none:'' }}">
+
                                         <i class="fa-solid fa-location-dot"></i>
                                         Use This Address
+
                                     </button>
 
                                     {% if not address.is_default %}
+
                                     <button
                                         type="button"
                                         class="set-default-address-button"
                                         data-default-url="{% url 'set_default_address' address.id %}">
+
                                         Set as Default
+
                                     </button>
+
                                     {% endif %}
 
                                     <button
                                         type="button"
                                         class="delete-address-button"
                                         data-delete-url="{% url 'delete_address' address.id %}">
+
                                         <i class="fa-solid fa-trash"></i>
                                         Delete
+
                                     </button>
 
                                 </div>
@@ -841,6 +1264,7 @@
                         {% else %}
 
                         <div class="account-empty-state">
+
                             <div class="empty-state-icon">
                                 <i class="fa-solid fa-location-dot"></i>
                             </div>
@@ -850,62 +1274,93 @@
                             <p>
                                 Add your home or work address for faster delivery.
                             </p>
+
                         </div>
 
                         {% endif %}
 
                     </div>
-                </div>
 
+                </div>
 
                 <!-- PAYMENTS -->
                 <div class="account-tab" id="myPaymentsTab">
+
                     <div class="account-panel">
+
                         <div class="account-panel-heading">
                             <div>
                                 <h2>Payment Methods</h2>
                                 <p>Manage your payment options</p>
                             </div>
                         </div>
+
                         <div class="account-empty-state">
-                            <div class="empty-state-icon"><i class="fa-solid fa-credit-card"></i></div>
+
+                            <div class="empty-state-icon">
+                                <i class="fa-solid fa-credit-card"></i>
+                            </div>
+
                             <h3>No payment methods saved</h3>
                             <p>Your payment options will appear here.</p>
+
                         </div>
+
                     </div>
+
                 </div>
 
                 <!-- SECURITY -->
                 <div class="account-tab" id="mySecurityTab">
+
                     <div class="account-panel">
+
                         <div class="account-panel-heading">
                             <div>
                                 <h2>Security</h2>
                                 <p>Keep your account safe</p>
                             </div>
                         </div>
+
                         <div class="security-option">
-                            <div class="security-option-icon"><i class="fa-solid fa-lock"></i></div>
+
+                            <div class="security-option-icon">
+                                <i class="fa-solid fa-lock"></i>
+                            </div>
+
                             <div class="security-option-content">
                                 <h3>Password</h3>
                                 <p>Update your account password</p>
                             </div>
+
                             <a href="#" class="security-action">Change</a>
+
                         </div>
+
                         <div class="security-option">
-                            <div class="security-option-icon"><i class="fa-solid fa-shield-halved"></i></div>
+
+                            <div class="security-option-icon">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+
                             <div class="security-option-content">
                                 <h3>Account Protection</h3>
                                 <p>Your account is protected by authentication</p>
                             </div>
+
                             <span class="security-active-label">Active</span>
+
                         </div>
+
                     </div>
+
                 </div>
 
                 <!-- SETTINGS -->
                 <div class="account-tab" id="mySettingsTab">
+
                     <div class="account-panel">
+
                         <div class="account-panel-heading">
                             <div>
                                 <h2>Settings</h2>
@@ -914,58 +1369,103 @@
                         </div>
 
                         <div class="account-preference-row">
+
                             <div class="account-preference-info">
-                                <div class="preference-icon"><i class="fa-solid fa-moon"></i></div>
+
+                                <div class="preference-icon">
+                                    <i class="fa-solid fa-moon"></i>
+                                </div>
+
                                 <div>
                                     <h3>Dark Mode</h3>
                                     <p>Change the appearance of your dashboard</p>
                                 </div>
+
                             </div>
-                            <button id="settingsThemeToggle" class="theme-toggle-button">Toggle Theme</button>
+
+                            <button
+                                type="button"
+                                id="settingsThemeToggle"
+                                class="theme-toggle-button">
+                                Toggle Theme
+                            </button>
+
                         </div>
 
                         <div class="account-preference-row">
+
                             <div class="account-preference-info">
-                                <div class="preference-icon"><i class="fa-solid fa-right-from-bracket"></i></div>
+
+                                <div class="preference-icon">
+                                    <i class="fa-solid fa-right-from-bracket"></i>
+                                </div>
+
                                 <div>
                                     <h3>Logout</h3>
                                     <p>Sign out of your FoodKart account</p>
                                 </div>
+
                             </div>
+
                             <form method="POST" action="{% url 'logout' %}">
                                 {% csrf_token %}
-                                <button type="submit" class="account-logout-settings">Logout</button>
+                                <button type="submit" class="account-logout-settings">
+                                    Logout
+                                </button>
                             </form>
+
                         </div>
+
                     </div>
+
                 </div>
 
             </section>
+
         </div>
 
         {% else %}
+
         <!-- GUEST PROFILE -->
         <div class="profile-container">
+
             <div class="profile-card">
-                <div class="profile-avatar"><i class="fa-solid fa-user"></i></div>
+
+                <div class="profile-avatar">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+
                 <h2>Please Login</h2>
                 <p>Login to access your FoodKart account.</p>
-                <a href="{% url 'login' %}" class="profile-login-btn">Login to Continue</a>
+
+                <a href="{% url 'login' %}" class="profile-login-btn">
+                    Login to Continue
+                </a>
+
             </div>
+
         </div>
+
         {% endif %}
+
     </main>
 
     <!-- FOOTER -->
     <footer id="mainFooter">
+
         <div class="footer-content">
+
             <div>
                 <h3>FoodKart</h3>
-                <p>Your favourite food, delivered fresh to your doorstep. Discover restaurants and enjoy delicious meals with FoodKart.</p>
+                <p>
+                    Your favourite food, delivered fresh to your doorstep.
+                    Discover restaurants and enjoy delicious meals with FoodKart.
+                </p>
             </div>
 
             <div>
                 <h3>Quick Links</h3>
+
                 <div class="footer-links">
                     <a href="#" id="footerHomeLink">Home</a>
                     <a href="#" id="footerRestaurantLink">Restaurants</a>
@@ -978,48 +1478,88 @@
                 <p>Email: support@foodkart.com</p>
                 <p>Phone: +91 9876543210</p>
             </div>
+
         </div>
-        <div class="copyright">© 2026 FoodKart. All Rights Reserved.</div>
+
+        <div class="copyright">
+            © 2026 FoodKart. All Rights Reserved.
+        </div>
+
     </footer>
 
-    <!-- CART DRAWER -->
+    <!-- CART OVERLAY -->
     <div class="cart-overlay" id="cartOverlay"></div>
 
+    <!-- CART DRAWER -->
     <aside class="cart-drawer" id="cartDrawer">
+
         <div class="cart-header">
             <h2>🛒 Your Cart</h2>
-            <button class="close-cart" id="closeCart">×</button>
+            <button type="button" class="close-cart" id="closeCart">×</button>
         </div>
 
         <div class="cart-items" id="cartItems">
+
             <div class="cart-empty">
                 <div>🛒</div>
                 <h3>Your cart is empty</h3>
                 <p>Add delicious food to get started.</p>
             </div>
+
         </div>
 
         <div class="cart-summary">
+
             <div class="cart-location">
+
                 <button type="button" id="cartLocationButton">
-                    <i class="fa-solid fa-location-dot"></i> Select Delivery Location
-                </button>
-                <div id="cartLocationDisplay" style="display:none;">
                     <i class="fa-solid fa-location-dot"></i>
+                    Select Delivery Location
+                </button>
+
+                <div id="cartLocationDisplay" style="display:none;">
+
+                    <i class="fa-solid fa-location-dot"></i>
+
                     <div>
                         <strong>Delivering to</strong>
                         <p id="cartAddressText"></p>
                     </div>
+
                 </div>
+
             </div>
 
-            <div class="bill-row"><span>Item Total</span><strong id="itemTotal">₹0</strong></div>
-            <div class="bill-row"><span>Delivery Fee</span><strong id="deliveryFee">₹0</strong></div>
-            <div class="bill-row"><span>Platform Fee</span><strong id="platformFee">₹0</strong></div>
-            <div class="bill-row bill-total"><span>To Pay</span><strong id="grandTotal">₹0</strong></div>
+            <div class="bill-row">
+                <span>Item Total</span>
+                <strong id="itemTotal">₹0</strong>
+            </div>
 
-            <button class="checkout-button" id="checkoutButton" disabled>Proceed to cart</button>
+            <div class="bill-row">
+                <span>Delivery Fee</span>
+                <strong id="deliveryFee">₹0</strong>
+            </div>
+
+            <div class="bill-row">
+                <span>Platform Fee</span>
+                <strong id="platformFee">₹0</strong>
+            </div>
+
+            <div class="bill-row bill-total">
+                <span>To Pay</span>
+                <strong id="grandTotal">₹0</strong>
+            </div>
+
+            <button
+                type="button"
+                class="checkout-button"
+                id="checkoutButton"
+                disabled>
+                Proceed to cart
+            </button>
+
         </div>
+
     </aside>
 
     <!-- JAVASCRIPT -->
