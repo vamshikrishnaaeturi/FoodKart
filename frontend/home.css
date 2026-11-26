@@ -5,7 +5,7 @@
    ============================================================ */
 
 /* ===================== GLOBAL ===================== */
-
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
 :root {
     --primary: #ff6b35;
     --primary-dark: #e95722;
@@ -36,7 +36,7 @@ html {
 }
 
 body {
-    font-family: "Segoe UI", Arial, sans-serif;
+    font-family: "Poppins", sans-serif;
     background: var(--bg);
     color: var(--text);
     line-height: 1.6;
