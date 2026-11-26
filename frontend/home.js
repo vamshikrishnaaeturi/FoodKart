@@ -375,40 +375,56 @@ function showRestaurants() {
     });
 }
 
-// =====================================================
-// CATEGORY CLICK EVENT
-// =====================================================
+/* ================= CATEGORY FILTER ================= */
 
+function filterRestaurants(category) {
+
+    const selected = (category || "all").toLowerCase();
+
+    document.querySelectorAll(".restaurant-card").forEach(card => {
+
+        const categories = (card.dataset.category || "")
+            .toLowerCase()
+            .split(/\s+/)
+            .filter(Boolean);
+
+        const matches =
+            selected === "all" ||
+            categories.includes(selected);
+
+        card.style.display = matches ? "" : "none";
+    });
+
+    // Update selected category
+    document.querySelectorAll(".category-card").forEach(card => {
+        card.classList.toggle(
+            "active",
+            card.dataset.category === selected
+        );
+    });
+}
+
+// Only ONE click event for category cards
 document.querySelectorAll(".category-card").forEach(card => {
 
     card.addEventListener("click", function () {
 
         const category = this.dataset.category || "all";
 
-        // Remove active class from all categories
-        document.querySelectorAll(".category-card").forEach(item => {
-            item.classList.remove("active");
-        });
-
-        // Activate selected category
-        this.classList.add("active");
-
-        // Filter restaurants
-        filterRestaurants(category);
-
-        // Clear previous search
+        // Reset search
         if (searchInput) {
             searchInput.value = "";
         }
 
-        // Clear previous suggestions
-        renderSearchSuggestions("");
+        if (searchSuggestions) {
+            searchSuggestions.style.display = "none";
+        }
 
-        // Show home page
-        showHome(document.getElementById("restaurantsSection"));
+        // Filter restaurant cards
+        filterRestaurants(category);
 
-        // Scroll to restaurants
-        document.getElementById("restaurantsSection")?.scrollIntoView({
+        // Scroll directly to restaurants
+        $("restaurantsSection")?.scrollIntoView({
             behavior: "smooth",
             block: "start"
         });
@@ -416,6 +432,8 @@ document.querySelectorAll(".category-card").forEach(card => {
     });
 
 });
+
+
 
 function showProfile() {
     hideAllPages();
