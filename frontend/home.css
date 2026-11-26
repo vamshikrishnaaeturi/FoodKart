@@ -1635,31 +1635,36 @@ body.dark-mode #restaurantGrid .restaurant-meta .rating,
 
 /* ===================== LOCATION / MAP SECTION ===================== */
 
+/* =========================================================
+   FOODKART — PREMIUM LOCATION SECTION
+   Dark Theme | Orange Accent | Desktop + Mobile Responsive
+========================================================= */
+
+/* ================= MAIN SECTION ================= */
+
 .food-location-section {
     position: relative;
     isolation: isolate;
-    width: 90%;
-    padding: 75px 5% 100px;
-    background: linear-gradient(145deg, #fffaf6 0%, #fff1e7 55%, #fffaf5 100%);
+    width: 100%;
+    padding: 75px 5% 90px;
+    background: linear-gradient(145deg, #101010, #171717, #101010);
     overflow: hidden;
     transition: background 0.35s ease;
+    box-sizing: border-box;
 }
 
-body.dark-mode .food-location-section,
-[data-theme="dark"] .food-location-section {
-    background: linear-gradient(145deg, #15171c, #1b1d23, #15171c);
-}
+/* Background decoration */
 
 .food-location-section::before {
     content: "";
     position: absolute;
     width: 480px;
     height: 480px;
-    top: -220px;
-    right: -130px;
+    top: -200px;
+    right: -140px;
     border-radius: 50%;
-    background: rgba(255, 107, 53, 0.09);
-    filter: blur(3px);
+    background: rgba(255, 107, 53, 0.10);
+    filter: blur(90px);
     pointer-events: none;
     z-index: -1;
 }
@@ -1670,18 +1675,21 @@ body.dark-mode .food-location-section,
     width: 400px;
     height: 400px;
     bottom: -200px;
-    left: -140px;
+    left: -120px;
     border-radius: 50%;
-    background: rgba(255, 183, 3, 0.08);
+    background: rgba(255, 183, 3, 0.07);
+    filter: blur(85px);
     pointer-events: none;
     z-index: -1;
 }
+
+/* ================= HEADING ================= */
 
 .location-heading {
     position: relative;
     z-index: 1;
     text-align: center;
-    margin-bottom: 48px;
+    margin-bottom: 50px;
 }
 
 .location-badge {
@@ -1691,313 +1699,475 @@ body.dark-mode .food-location-section,
     gap: 9px;
     padding: 10px 20px;
     border-radius: 50px;
-    background: #fff0e6;
-    border: 1px solid #ffddca;
-    color: #f3590c;
-    font-size: 12px;
-    font-weight: 850;
-    letter-spacing: 1.3px;
-    margin-bottom: 18px;
-    box-shadow: 0 4px 15px rgba(243, 89, 12, 0.06);
-}
 
-body.dark-mode .location-badge,
-[data-theme="dark"] .location-badge {
-    background: #30231e;
-    border-color: #543629;
-    color: #ff8954;
+    background: rgba(255, 107, 53, 0.10);
+    border: 1px solid rgba(255, 107, 53, 0.28);
+
+    color: #ff8a58;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+
+    margin-bottom: 18px;
+
+    box-shadow: 0 0 25px rgba(255, 107, 53, 0.06);
 }
 
 .location-heading h2 {
-    font-size: clamp(29px, 4vw, 43px);
-    font-weight: 950;
-    color: var(--dark);
-    margin-bottom: 12px;
-    letter-spacing: -1.4px;
+    font-size: clamp(29px, 4vw, 45px);
+    font-weight: 900;
+    color: #ffffff;
+    margin-bottom: 13px;
+    letter-spacing: -1.5px;
     line-height: 1.2;
 }
 
 .location-heading p {
-    max-width: 620px;
+    max-width: 650px;
     margin: 0 auto;
     font-size: 15px;
-    color: var(--muted);
+    color: #a5a5a5;
     line-height: 1.8;
 }
+
+/* ================= MAIN CONTAINER ================= */
 
 .location-container {
     position: relative;
     z-index: 1;
+
     display: grid;
-    grid-template-columns: minmax(360px, 420px) minmax(0, 1fr);
-    gap: 28px;
+    grid-template-columns: minmax(330px, 390px) minmax(0, 1fr);
+
+    gap: 25px;
     max-width: 1500px;
     width: 100%;
     margin: 0 auto;
+
     align-items: stretch;
 }
+
+/* ================= LOCATION SIDEBAR ================= */
 
 .location-sidebar {
     min-width: 0;
     padding: 28px;
+    box-sizing: border-box;
+
     border-radius: 22px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-    color: var(--text);
+
+    background: linear-gradient(
+        145deg,
+        #1c1c1c,
+        #161616
+    );
+
+    border: 1px solid #303030;
+
+    box-shadow:
+        0 15px 45px rgba(0, 0, 0, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.025);
+
+    color: #ffffff;
 }
 
 .location-sidebar h3 {
     font-size: 22px;
     font-weight: 850;
-    color: var(--dark);
-    margin: 0 0 6px;
+    color: #ffffff;
+    margin: 0 0 7px;
 }
 
 .location-sidebar > p {
-    color: var(--muted);
+    color: #929292;
     font-size: 13.5px;
-    margin: 0 0 20px;
+    margin: 0 0 22px;
 }
+
+/* ================= SEARCH BOX ================= */
 
 .map-search-box {
     display: flex;
     align-items: center;
+
     width: 100%;
-    min-height: 48px;
+    min-height: 52px;
     overflow: hidden;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    transition: 0.25s ease;
+
+    background: #111111;
+    border: 1px solid #343434;
+    border-radius: 13px;
+
+    transition: all 0.25s ease;
 }
 
 .map-search-box:focus-within {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.12);
+    border-color: #ff6b35;
+
+    box-shadow:
+        0 0 0 3px rgba(255, 107, 53, 0.12),
+        0 0 18px rgba(255, 107, 53, 0.05);
 }
 
 .map-search-box input {
     flex: 1;
     width: 100%;
     min-width: 0;
-    padding: 12px 14px;
+
+    padding: 14px 15px;
+
     border: none;
     outline: none;
+
     background: transparent;
-    color: var(--dark);
-    font-size: 13.5px;
+    color: #ffffff;
+
+    font-size: 14px;
+    font-family: inherit;
 }
 
 .map-search-box input::placeholder {
-    color: var(--muted);
+    color: #777777;
 }
 
 .map-search-box button {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    min-width: 48px;
-    height: 48px;
+
+    width: 50px;
+    min-width: 50px;
+    height: 52px;
+
     border: none;
-    background: var(--primary);
+    background: #ff6b35;
     color: #ffffff;
-    font-size: 15px;
-    transition: background 0.25s ease;
+
+    font-size: 16px;
+    cursor: pointer;
+
+    transition: all 0.25s ease;
 }
 
 .map-search-box button:hover {
-    background: var(--primary-dark);
+    background: #ff824f;
 }
+
+/* ================= CURRENT LOCATION BUTTON ================= */
 
 .current-location-button {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 9px;
+    gap: 10px;
+
     width: 100%;
-    min-height: 46px;
-    margin: 12px 0 20px;
-    padding: 12px 15px;
-    background: rgba(255, 107, 53, 0.09);
-    border: 1px solid rgba(255, 107, 53, 0.35);
-    border-radius: 11px;
-    color: var(--primary);
+    min-height: 48px;
+
+    margin: 13px 0 22px;
+    padding: 13px 15px;
+
+    background: rgba(255, 107, 53, 0.08);
+    border: 1px solid rgba(255, 107, 53, 0.28);
+    border-radius: 12px;
+
+    color: #ff8a58;
     font-size: 13.5px;
     font-weight: 750;
-    transition: 0.25s ease;
+    font-family: inherit;
+
+    cursor: pointer;
+    transition: all 0.25s ease;
 }
 
 .current-location-button:hover {
     background: rgba(255, 107, 53, 0.16);
-    border-color: var(--primary);
-    transform: translateY(-1px);
+    border-color: #ff6b35;
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 7px 20px rgba(255, 107, 53, 0.08);
 }
 
+.current-location-button:active {
+    transform: scale(0.98);
+}
+
+/* ================= SELECTED LOCATION ================= */
+
 .selected-location-card {
-    padding: 18px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 16px;
+    padding: 19px;
+
+    background: #121212;
+    border: 1px solid #303030;
+    border-radius: 15px;
+
+    transition: border-color 0.25s ease;
+}
+
+.selected-location-card:hover {
+    border-color: rgba(255, 107, 53, 0.4);
 }
 
 .selected-location-card > span {
     display: block;
-    color: var(--muted);
+
+    color: #888888;
     font-size: 12px;
     font-weight: 700;
-    margin-bottom: 6px;
+
+    margin-bottom: 8px;
 }
 
 #selectedLocationText {
-    color: var(--dark);
+    color: #f4f4f4;
     font-size: 14px;
     font-weight: 750;
-    line-height: 1.5;
+    line-height: 1.6;
+
     margin: 0;
     overflow-wrap: anywhere;
 }
 
+/* ================= SAVE ADDRESS CONTROLS ================= */
+
 .save-address-controls {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border);
+    gap: 11px;
+
+    margin-top: 20px;
+    padding-top: 20px;
+
+    border-top: 1px solid #303030;
 }
 
 .save-address-controls label {
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 750;
-    color: var(--dark);
+    color: #e5e5e5;
 }
 
 #savedAddressType {
     width: 100%;
-    min-height: 42px;
-    padding: 9px 12px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--dark);
+    min-height: 45px;
+
+    padding: 11px 13px;
+
+    border-radius: 11px;
+    border: 1px solid #343434;
+
+    background: #121212;
+    color: #ffffff;
+
     font-size: 13.5px;
+    font-family: inherit;
     outline: none;
+
+    transition: border 0.25s ease;
 }
 
 #savedAddressType:focus {
-    border-color: var(--primary);
+    border-color: #ff6b35;
 }
+
+#savedAddressType option {
+    background: #171717;
+    color: #ffffff;
+}
+
+/* ================= SAVE BUTTON ================= */
 
 #saveSelectedAddressButton {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 9px;
+
     width: 100%;
-    min-height: 44px;
-    padding: 11px 16px;
+    min-height: 47px;
+
+    padding: 12px 16px;
+
     border: none;
-    border-radius: 11px;
-    background: var(--primary);
+    border-radius: 12px;
+
+    background: linear-gradient(
+        135deg,
+        #ff6b35,
+        #ff4f16
+    );
+
     color: #ffffff;
     font-size: 13.5px;
     font-weight: 800;
+    font-family: inherit;
+
+    cursor: pointer;
+
+    box-shadow: 0 6px 18px rgba(255, 107, 53, 0.15);
+
     transition: all 0.25s ease;
 }
 
 #saveSelectedAddressButton:hover {
-    background: var(--primary-dark);
-    transform: translateY(-1px);
+    background: linear-gradient(
+        135deg,
+        #ff824f,
+        #ff6128
+    );
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 9px 24px rgba(255, 107, 53, 0.22);
 }
+
+#saveSelectedAddressButton:active {
+    transform: scale(0.98);
+}
+
+/* ================= MAP WRAPPER ================= */
 
 .food-map-wrapper {
     min-width: 0;
     overflow: hidden;
-    background: var(--surface);
-    border: 1px solid var(--border);
+
+    background: #171717;
+    border: 1px solid #303030;
     border-radius: 22px;
-    box-shadow: var(--shadow);
+
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
+
     display: flex;
     flex-direction: column;
 }
 
+/* ================= MAP HEADER ================= */
+
 .map-top-label {
     display: flex;
     align-items: center;
-    gap: 10px;
-    min-height: 64px;
-    padding: 14px 20px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    color: var(--dark);
+    gap: 11px;
+
+    min-height: 65px;
+    padding: 15px 21px;
+
+    background: #1b1b1b;
+    border-bottom: 1px solid #303030;
+
+    color: #ffffff;
     font-size: 15px;
     font-weight: 800;
 }
 
 .map-live-badge {
     margin-left: auto;
+
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 6px 13px;
-    background: rgba(255, 107, 53, 0.12);
-    border: 1px solid rgba(255, 107, 53, 0.25);
-    border-radius: 20px;
-    color: var(--primary);
+    gap: 7px;
+
+    padding: 7px 13px;
+
+    background: rgba(255, 107, 53, 0.09);
+    border: 1px solid rgba(255, 107, 53, 0.24);
+    border-radius: 30px;
+
+    color: #ff8958;
     font-size: 11.5px;
     font-weight: 800;
     white-space: nowrap;
 }
 
+/* ================= MAP ================= */
+
 #foodKartMap {
     position: relative;
+
     width: 100%;
     height: 540px;
     flex: 1;
+
     z-index: 1;
-    background: var(--bg);
+
+    background: #1b1b1b;
 }
 
+/* Leaflet zoom controls */
+
 #foodKartMap .leaflet-control-zoom a {
-    background: var(--surface);
-    color: var(--dark);
-    border-color: var(--border);
+    background: #202020;
+    color: #ffffff;
+    border-color: #383838;
 }
 
 #foodKartMap .leaflet-control-zoom a:hover {
-    background: var(--bg);
-    color: var(--primary);
+    background: #303030;
+    color: #ff6b35;
 }
 
+/* Map attribution */
+
 #foodKartMap .leaflet-control-attribution {
-    background: rgba(255, 255, 255, 0.85);
-    color: #444;
+    background: rgba(20, 20, 20, 0.88);
+    color: #b0b0b0;
     font-size: 10px;
 }
 
-body.dark-mode #foodKartMap .leaflet-control-attribution,
-[data-theme="dark"] #foodKartMap .leaflet-control-attribution {
-    background: rgba(24, 26, 31, 0.88);
-    color: #d0d2d8;
+#foodKartMap .leaflet-control-attribution a {
+    color: #ff8958;
 }
 
-body.dark-mode #foodKartMap .leaflet-control-attribution a,
-[data-theme="dark"] #foodKartMap .leaflet-control-attribution a {
-    color: #ff875c;
-}
+/* Map popups */
 
 #foodKartMap .leaflet-popup-content-wrapper,
 #foodKartMap .leaflet-popup-tip {
-    background: var(--surface);
-    color: var(--text);
+    background: #202020;
+    color: #ffffff;
 }
 
+#foodKartMap .leaflet-popup-content {
+    color: #eeeeee;
+}
+
+/* ================= DARK MODE ================= */
+
+body.dark-mode .food-location-section,
+[data-theme="dark"] .food-location-section {
+    background: linear-gradient(
+        145deg,
+        #101010,
+        #171717,
+        #101010
+    );
+}
+
+body.dark-mode .location-sidebar,
+[data-theme="dark"] .location-sidebar {
+    background: linear-gradient(
+        145deg,
+        #1c1c1c,
+        #161616
+    );
+}
+
+body.dark-mode .food-map-wrapper,
+[data-theme="dark"] .food-map-wrapper {
+    background: #171717;
+}
+
+/* ================= TABLET ================= */
+
 @media (max-width: 1000px) {
+
     .location-container {
-        grid-template-columns: 340px minmax(0, 1fr);
+        grid-template-columns: minmax(290px, 340px) minmax(0, 1fr);
         gap: 20px;
+    }
+
+    .location-sidebar {
+        padding: 23px;
     }
 
     #foodKartMap {
@@ -2005,35 +2175,165 @@ body.dark-mode #foodKartMap .leaflet-control-attribution a,
     }
 }
 
+/* ================= MOBILE LAYOUT ================= */
+/*
+   Order:
+   1. Location heading
+   2. Search Location sidebar
+   3. Map underneath the search section
+*/
+
 @media (max-width: 800px) {
+
     .food-location-section {
-        padding: 50px 4% 70px;
+        padding: 45px 4% 60px;
+    }
+
+    .location-heading {
+        margin-bottom: 30px;
     }
 
     .location-container {
-        grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        width: 100%;
+    }
+
+    /* SEARCH LOCATION — FIRST */
+
+    .location-sidebar {
+        order: 1;
+
+        width: 100%;
+        min-width: 0;
+
+        padding: 22px;
+        box-sizing: border-box;
+    }
+
+    /* MAP — SECOND */
+
+    .food-map-wrapper {
+        order: 2;
+
+        width: 100%;
+        min-width: 0;
+        min-height: auto;
+
+        box-sizing: border-box;
     }
 
     #foodKartMap {
+        width: 100%;
         height: 400px;
+        min-height: 400px;
     }
 }
 
+/* ================= SMALL MOBILE ================= */
+
 @media (max-width: 520px) {
+
+    .food-location-section {
+        padding: 35px 15px 50px;
+    }
+
+    .location-heading {
+        margin-bottom: 25px;
+    }
+
+    .location-heading h2 {
+        font-size: 26px;
+        letter-spacing: -0.8px;
+    }
+
+    .location-heading p {
+        font-size: 13.5px;
+        padding: 0 10px;
+    }
+
+    .location-badge {
+        font-size: 10.5px;
+        padding: 9px 15px;
+    }
+
+    .location-container {
+        gap: 16px;
+    }
+
     .location-sidebar {
+        order: 1;
         padding: 18px;
-        border-radius: 16px;
+        border-radius: 17px;
+    }
+
+    .location-sidebar h3 {
+        font-size: 20px;
     }
 
     .food-map-wrapper {
-        border-radius: 16px;
+        order: 2;
+        border-radius: 17px;
+    }
+
+    .map-top-label {
+        min-height: 55px;
+        padding: 12px 14px;
+        font-size: 13px;
+    }
+
+    .map-live-badge {
+        padding: 6px 9px;
+        font-size: 10px;
     }
 
     #foodKartMap {
         height: 340px;
+        min-height: 340px;
+    }
+
+    .selected-location-card {
+        padding: 15px;
+    }
+
+    #selectedLocationText {
+        font-size: 13px;
     }
 }
 
+/* ================= EXTRA SMALL MOBILE ================= */
+
+@media (max-width: 360px) {
+
+    .food-location-section {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .location-heading h2 {
+        font-size: 23px;
+    }
+
+    .location-sidebar {
+        padding: 15px;
+    }
+
+    .map-live-badge {
+        font-size: 9px;
+        padding: 5px 7px;
+    }
+
+    .map-top-label {
+        font-size: 12px;
+        gap: 7px;
+    }
+
+    #foodKartMap {
+        height: 310px;
+        min-height: 310px;
+    }
+}
 
 /* ===================== MENU PAGE ===================== */
 
