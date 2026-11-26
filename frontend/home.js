@@ -386,6 +386,18 @@ function showCategories() {
 
     setActiveLink(categoryLink);
 
+    // Clear previous search
+    if (searchInput) {
+        searchInput.value = "";
+    }
+
+    // Reset category selection
+    filterRestaurants("all");
+
+    // Clear previous food suggestions
+    renderSearchSuggestions("");
+
+    // Scroll to Categories section
     $("categoriesSection")?.scrollIntoView({
         behavior: "smooth",
         block: "start"
