@@ -375,34 +375,47 @@ function showRestaurants() {
     });
 }
 
-function showCategories() {
-    hideAllPages();
-    showFooter();
+// =====================================================
+// CATEGORY CLICK EVENT
+// =====================================================
 
-    if (homePage) {
-        homePage.hidden = false;
-        homePage.style.display = "block";
-    }
+document.querySelectorAll(".category-card").forEach(card => {
 
-    setActiveLink(categoryLink);
+    card.addEventListener("click", function () {
 
-    // Clear previous search
-    if (searchInput) {
-        searchInput.value = "";
-    }
+        const category = this.dataset.category || "all";
 
-    // Reset category selection
-    filterRestaurants("all");
+        // Remove active class from all categories
+        document.querySelectorAll(".category-card").forEach(item => {
+            item.classList.remove("active");
+        });
 
-    // Clear previous food suggestions
-    renderSearchSuggestions("");
+        // Activate selected category
+        this.classList.add("active");
 
-    // Scroll to Categories section
-    $("categoriesSection")?.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
+        // Filter restaurants
+        filterRestaurants(category);
+
+        // Clear previous search
+        if (searchInput) {
+            searchInput.value = "";
+        }
+
+        // Clear previous suggestions
+        renderSearchSuggestions("");
+
+        // Show home page
+        showHome(document.getElementById("restaurantsSection"));
+
+        // Scroll to restaurants
+        document.getElementById("restaurantsSection")?.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+
     });
-}
+
+});
 
 function showProfile() {
     hideAllPages();
