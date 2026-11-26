@@ -1638,7 +1638,7 @@ body.dark-mode #restaurantGrid .restaurant-meta .rating,
 .food-location-section {
     position: relative;
     isolation: isolate;
-    width: 100%;
+    width: 90%;
     padding: 75px 5% 100px;
     background: linear-gradient(145deg, #fffaf6 0%, #fff1e7 55%, #fffaf5 100%);
     overflow: hidden;
